@@ -11,12 +11,18 @@ GSEGame::GSEGame()
 
 	// Test Objects
 	for (int i = 0; i < 1000; ++i) {
-		float randX = ((float)rand() / (float)RAND_MAX) * 500.f - 250.f;
-		float randY = ((float)rand() / (float)RAND_MAX) * 500.f - 250.f;
-		float depth = 0.f;
-		float randSX = ((float)rand() / (float)RAND_MAX) * 10.f;
-		float randSY = ((float)rand() / (float)RAND_MAX) * 10.f;
-		AddObject(randX, randY, depth, randSX, randSY);
+		float randX		= ((float)rand() / (float)RAND_MAX) * 500.f - 250.f;
+		float randY		= ((float)rand() / (float)RAND_MAX) * 500.f - 250.f;
+		float depth		= 0.f;
+		float randSX	= ((float)rand() / (float)RAND_MAX) * 10.f;
+		float randSY	= ((float)rand() / (float)RAND_MAX) * 10.f;
+		float randVelX	= ((float)rand() / (float)RAND_MAX) * 3.f;
+		float randVelY	= ((float)rand() / (float)RAND_MAX) * 3.f;
+		float accX		= 0.f; 
+		float accY		= 0.f;
+		float mass		= 1.f;
+
+		AddObject(randX, randY, depth, randSX, randSY, randVelX, randVelY, accX, accY, mass);
 	}
 }
 
@@ -46,7 +52,22 @@ void GSEGame::RenderScene()
 	}
 }
 
-int GSEGame::AddObject(float x, float y, float depth, float sx, float sy)
+void GSEGame::Update(float elapsedTimeInSec)
+{
+	// Update All Objects
+	for (int i = 0; i < GSE_MAX_OBJECTS; ++i) {
+		if (m_Objects[i] != NULL) {
+			m_Objects[i]->Update(elapsedTimeInSec);
+		}
+	}
+}
+
+
+int GSEGame::AddObject(float x, float y, float depth,
+	float sx, float sy,
+	float velX, float velY,
+	float accX, float accY,
+	float mass)
 {
 	// find empty slot
 	int index = -1;
@@ -56,10 +77,17 @@ int GSEGame::AddObject(float x, float y, float depth, float sx, float sy)
 			break;
 		}
 	}
+	if (index < 0) {
+		std::cout << "No empty object slot.." << std::endl;
+		return -1;
+	}
 
 	m_Objects[index] = new GSEObject();
 	m_Objects[index]->SetPosition(x, y, depth);
 	m_Objects[index]->SetSize(sx, sy);
+	m_Objects[index]->SetVel(velX, velY);
+	m_Objects[index]->SetAcc(accX, accY);
+	m_Objects[index]->SetMass(mass);
 
 	return index;
 }

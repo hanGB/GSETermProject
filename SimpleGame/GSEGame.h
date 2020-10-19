@@ -11,8 +11,14 @@ public:
 	~GSEGame();
 	
 	void RenderScene();
-	int AddObject(float x, float y, float depth, float sx, float sy);
+	int AddObject(float x, float y, float depth,
+		float sx, float sy,
+		float velX, float velY,
+		float accX, float accY,
+		float mass
+		);
 	void DeleteObject(int index);
+	void Update(float elapsedTimeInSec);
 
 private:
 	Renderer* m_renderer = NULL;

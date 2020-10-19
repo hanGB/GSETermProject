@@ -23,7 +23,9 @@ void RenderScene(int temp)
 	int currentTime = glutGet(GLUT_ELAPSED_TIME);
 	int elapsedTime = currentTime - g_prevTimeInMillisecond;
 	g_prevTimeInMillisecond = currentTime;
+	float elapsedTimeInSec = (float)elapsedTime / 1000.f;
 
+	g_GSEGame->Update(elapsedTimeInSec);
 	g_GSEGame->RenderScene();
 
 	glutSwapBuffers();
