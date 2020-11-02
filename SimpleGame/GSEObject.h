@@ -1,11 +1,13 @@
 #pragma once
+#include "GSEGlobals.h"
+
 class GSEObject
 {
 public:
 	GSEObject();
 	~GSEObject();
 
-	void Update(float elapsedTimeInSec);
+	void Update(float elapsedTimeInSec, GSEUpdateParams* param);
 
 	void SetPosition(float x, float y, float depth);
 	void SetSize(float sx, float sy);

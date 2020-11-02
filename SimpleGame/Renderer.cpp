@@ -184,6 +184,6 @@ void Renderer::DrawSolidRect(float x, float y, float z, float size, float r, flo
 
 void Renderer::GetGLPosition(float x, float y, float *newX, float *newY)
 {
-	*newX = x * 2.f / m_WindowSizeX;
-	*newY = y * 2.f / m_WindowSizeY;
+	*newX = x * 2.f / (float)m_WindowSizeX;
+	*newY = y * 2.f / (float)m_WindowSizeY;
 }

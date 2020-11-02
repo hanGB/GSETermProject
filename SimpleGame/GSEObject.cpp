@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "GSEObject.h"
+#include "GSEGlobals.h"
 
-#define GSE_NULL_VAL -1000000;
 
 GSEObject::GSEObject()
 {
@@ -21,12 +21,26 @@ GSEObject::~GSEObject()
 {
 }
 
-void GSEObject::Update(float elapsedTimeInSec)
+void GSEObject::Update(float elapsedTimeInSec, GSEUpdateParams* param)
 {
+	float t = elapsedTimeInSec;
+	float tt = elapsedTimeInSec * elapsedTimeInSec;
+
+	// calce temporary
+	float accX = param->forceX / m_Mass;
+	float accY = param->forceY / m_Mass;
+
+	// sum with objec'acc
+	accX += m_AccX;
+	accY += m_AccY;
+
 	// update position
-	// pos = prevPos + vel * elapsedTime
-	m_PositionX = m_PositionX + m_VelX * elapsedTimeInSec;
-	m_PositionY = m_PositionY + m_VelY * elapsedTimeInSec;
+	m_PositionX = m_PositionX + m_VelX * t + 0.5f * accX * tt;
+	m_PositionY = m_PositionY + m_VelY * t + 0.5f * accY * tt;
+
+	// update velocity
+	m_VelX = m_VelX + accX * t;
+	m_VelY = m_VelY + accY * t;
 }
 
 void GSEObject::SetPosition(float x, float y, float depth)

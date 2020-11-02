@@ -9,8 +9,11 @@ GSEGame::GSEGame()
 		m_Objects[i] = NULL;
 	}
 
+	// Create Hero
+	m_HeroID = AddObject(0, 0, 0, 20, 20, 0, 0, 0, 0, 2);
+
 	// Test Objects
-	for (int i = 0; i < 1000; ++i) {
+	for (int i = 0; i < 50; ++i) {
 		float randX		= ((float)rand() / (float)RAND_MAX) * 500.f - 250.f;
 		float randY		= ((float)rand() / (float)RAND_MAX) * 500.f - 250.f;
 		float depth		= 0.f;
@@ -52,12 +55,44 @@ void GSEGame::RenderScene()
 	}
 }
 
-void GSEGame::Update(float elapsedTimeInSec)
+void GSEGame::Update(float elapsedTimeInSec, GSEInputs* inputs)
 {
+	GSEUpdateParams othersParam;
+	GSEUpdateParams heroParam;
+	memset(&othersParam, 0, sizeof(GSEUpdateParams));
+	memset(&heroParam, 0, sizeof(GSEUpdateParams));
+
+	// calc force
+	float forceAmount = 200.f;
+	if (inputs->KEY_W)
+	{
+		heroParam.forceY += forceAmount;
+	}
+	if (inputs->KEY_A)
+	{
+		heroParam.forceX += -forceAmount;
+	}
+	if (inputs->KEY_S)
+	{
+		heroParam.forceY += -forceAmount;
+	}
+	if (inputs->KEY_D)
+	{
+		heroParam.forceX += forceAmount;
+	}
+
 	// Update All Objects
 	for (int i = 0; i < GSE_MAX_OBJECTS; ++i) {
 		if (m_Objects[i] != NULL) {
-			m_Objects[i]->Update(elapsedTimeInSec);
+			if (i == m_HeroID)
+			{
+				m_Objects[i]->Update(elapsedTimeInSec, &heroParam);
+			}
+			else
+			{
+				m_Objects[i]->Update(elapsedTimeInSec, &othersParam);
+			}
+			
 		}
 	}
 }

@@ -1,8 +1,7 @@
 #pragma once
 #include "Renderer.h"
 #include "GSEObject.h"
-
-#define GSE_MAX_OBJECTS 1000
+#include "GSEGlobals.h"
 
 class GSEGame
 {
@@ -18,10 +17,11 @@ public:
 		float mass
 		);
 	void DeleteObject(int index);
-	void Update(float elapsedTimeInSec);
+	void Update(float elapsedTimeInSec, GSEInputs* inputs);
 
 private:
 	Renderer* m_renderer = NULL;
 	GSEObject* m_Objects[GSE_MAX_OBJECTS];
+	int m_HeroID = -1;
 };
 
