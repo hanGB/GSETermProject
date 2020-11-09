@@ -34,6 +34,9 @@ void GSEObject::Update(float elapsedTimeInSec, GSEUpdateParams* param)
 	accX += m_AccX;
 	accY += m_AccY;
 
+	// apply gravity
+	accY -= GSE_GRAVITY;
+
 	// update position
 	m_PositionX = m_PositionX + m_VelX * t + 0.5f * accX * tt;
 	m_PositionY = m_PositionY + m_VelY * t + 0.5f * accY * tt;

@@ -10,23 +10,9 @@ GSEGame::GSEGame()
 	}
 
 	// Create Hero
-	m_HeroID = AddObject(0, 0, 0, 20, 20, 0, 0, 0, 0, 2);
+	m_HeroID = AddObject(0, 0, 0, 1, 1, 0, 0, 0, 0, 20);
 
-	// Test Objects
-	for (int i = 0; i < 50; ++i) {
-		float randX		= ((float)rand() / (float)RAND_MAX) * 500.f - 250.f;
-		float randY		= ((float)rand() / (float)RAND_MAX) * 500.f - 250.f;
-		float depth		= 0.f;
-		float randSX	= ((float)rand() / (float)RAND_MAX) * 10.f;
-		float randSY	= ((float)rand() / (float)RAND_MAX) * 10.f;
-		float randVelX	= ((float)rand() / (float)RAND_MAX) * 3.f;
-		float randVelY	= ((float)rand() / (float)RAND_MAX) * 3.f;
-		float accX		= 0.f; 
-		float accY		= 0.f;
-		float mass		= 1.f;
-
-		AddObject(randX, randY, depth, randSX, randSY, randVelX, randVelY, accX, accY, mass);
-	}
+	int floor = AddObject(-1.25, -2.5, 0, 2, 0.3, 0, 0, 0, 0, 10000);
 }
 
 GSEGame::~GSEGame()
@@ -50,7 +36,13 @@ void GSEGame::RenderScene()
 			float sx, sy;
 			m_Objects[i]->GetSize(&sx, &sy);
 
-				m_renderer->DrawSolidRect(x, y, depth, sx, 1, 0, 1, 1);
+			// meter to pixel
+			x = x * 100.f;
+			y = y * 100.f;
+			sx = sx * 100.f;
+			sy = sy * 100.f;
+
+			m_renderer->DrawSolidRect(x, y, depth, sx, sy, 1, 0, 1, 1);
 		}
 	}
 }
@@ -63,7 +55,7 @@ void GSEGame::Update(float elapsedTimeInSec, GSEInputs* inputs)
 	memset(&heroParam, 0, sizeof(GSEUpdateParams));
 
 	// calc force
-	float forceAmount = 200.f;
+	float forceAmount = 400.f;
 	if (inputs->KEY_W)
 	{
 		heroParam.forceY += forceAmount;

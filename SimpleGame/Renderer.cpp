@@ -158,7 +158,7 @@ GLuint Renderer::CompileShaders(char* filenameVS, char* filenameFS)
 	return ShaderProgram;
 }
 
-void Renderer::DrawSolidRect(float x, float y, float z, float size, float r, float g, float b, float a)
+void Renderer::DrawSolidRect(float x, float y, float z, float sizeX, float sizeY, float r, float g, float b, float a)
 {
 	float newX, newY;
 
@@ -167,7 +167,7 @@ void Renderer::DrawSolidRect(float x, float y, float z, float size, float r, flo
 	//Program select
 	glUseProgram(m_SolidRectShader);
 
-	glUniform4f(glGetUniformLocation(m_SolidRectShader, "u_Trans"), newX, newY, 0, size);
+	glUniform4f(glGetUniformLocation(m_SolidRectShader, "u_Trans"), newX, newY, sizeX, sizeY);
 	glUniform4f(glGetUniformLocation(m_SolidRectShader, "u_Color"), r, g, b, a);
 
 	int attribPosition = glGetAttribLocation(m_SolidRectShader, "a_Position");

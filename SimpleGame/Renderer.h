@@ -14,7 +14,7 @@ public:
 	~Renderer();
 
 	bool IsInitialized();
-	void DrawSolidRect(float x, float y, float z, float size, float r, float g, float b, float a);
+	void DrawSolidRect(float x, float y, float z, float sizeX, float sizeY, float r, float g, float b, float a);
 
 private:
 	void Initialize(int windowSizeX, int windowSizeY);
