@@ -20,6 +20,10 @@ public:
 	void Update(float elapsedTimeInSec, GSEInputs* inputs);
 
 private:
+	bool AABBCollsion(GSEObject* a, GSEObject* b);
+	void ProcessCollision(GSEObject* a, GSEObject* b);
+	void AdjustPosition(GSEObject* a, GSEObject* b);
+
 	Renderer* m_renderer = NULL;
 	GSEObject* m_Objects[GSE_MAX_OBJECTS];
 	int m_HeroID = -1;

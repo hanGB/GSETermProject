@@ -23,3 +23,16 @@ typedef struct GSEUpdateParams
 	float forceX;
 	float forceY;
 };
+
+enum GSEObjectType {
+	TYPE_HERO,
+	TYPE_MOVABLE,
+	TYPE_FIXED,
+};
+
+enum GSEObjectState {
+	STATE_GROUND,
+	STATE_FALLING,
+	STATE_FLY,
+	STATE_SWIMMING,
+};
