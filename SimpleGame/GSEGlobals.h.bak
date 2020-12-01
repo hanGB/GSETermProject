@@ -28,8 +28,6 @@ enum GSEObjectType {
 	TYPE_HERO,
 	TYPE_MOVABLE,
 	TYPE_FIXED,
-	TYPE_BULLET,
-	TYPE_SWORD,
 };
 
 enum GSEObjectState {

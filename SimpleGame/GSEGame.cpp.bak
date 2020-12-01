@@ -21,7 +21,34 @@ GSEGame::GSEGame()
 
 GSEGame::~GSEGame()
 {
-	//Renderer delete
+	// delete renderer
+	delete		m_renderer;
+	delete[]	m_Objects;
+}
+
+void GSEGame::RenderScene()
+{
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClearColor(0.0f, 0.3f, 0.3f, 1.0f);
+
+	// Draw All Objects
+	for (int i = 0; i < GSE_MAX_OBJECTS; ++i) {
+		if (m_Objects[i] != NULL) {
+			float x, y, depth;
+			m_Objects[i]->GetPosition(&x, &y, &depth);
+
+			float sx, sy;
+			m_Objects[i]->GetSize(&sx, &sy);
+
+			// meter to pixel
+			x = x * 100.f;
+			y = y * 100.f;
+			sx = sx * 100.f;
+			sy = sy * 100.f;
+
+			m_renderer->DrawSolidRect(x, y, depth, sx, sy, 1, 0, 1, 1);
+		}
+	}
 }
 
 void GSEGame::Update(float elapsedTimeInSec, GSEInputs* inputs)
@@ -35,7 +62,7 @@ void GSEGame::Update(float elapsedTimeInSec, GSEInputs* inputs)
 	float forceAmount = 400.f;
 	if (inputs->KEY_W)
 	{
-		heroParam.forceY += 20*forceAmount;
+		heroParam.forceY += forceAmount;
 	}
 	if (inputs->KEY_A)
 	{
@@ -50,39 +77,18 @@ void GSEGame::Update(float elapsedTimeInSec, GSEInputs* inputs)
 		heroParam.forceX += forceAmount;
 	}
 
-	//Processing collision
-	bool isCollide[GSE_MAX_OBJECTS];
-	memset(isCollide, 0, sizeof(bool) * GSE_MAX_OBJECTS);
-	for (int i = 0; i < GSE_MAX_OBJECTS; i++)
-	{
-		for (int j = i + 1; j < GSE_MAX_OBJECTS; j++)
-		{
-			if (m_Objects[i] != NULL && m_Objects[j] != NULL)
-			{
-				bool collide = ProcessCollision(m_Objects[i], m_Objects[j]);
-				if (collide)
-				{
-					isCollide[i] = true;
-					isCollide[j] = true;
-				}
+	// Processing collision
+	for (int i = 0; i < GSE_MAX_OBJECTS; i++) {
+		for (int j = i + 1; j < GSE_MAX_OBJECTS; j++) {
+			if (m_Objects[i] != NULL && m_Objects[j] != NULL) {
+				ProcessCollision(m_Objects[i], m_Objects[j]);
 			}
 		}
 	}
 
-	for (int i = 0; i < GSE_MAX_OBJECTS; i++)
-	{
-		if (m_Objects[i] != NULL)
-		{
-			if (!isCollide[i])
-				m_Objects[i]->SetState(GSEObjectState::STATE_FALLING);
-		}
-	}
-
-	//Update All Objects
-	for (int i = 0; i < GSE_MAX_OBJECTS; i++)
-	{
-		if (m_Objects[i] != NULL)
-		{
+	// Update All Objects
+	for (int i = 0; i < GSE_MAX_OBJECTS; ++i) {
+		if (m_Objects[i] != NULL) {
 			if (i == m_HeroID)
 			{
 				m_Objects[i]->Update(elapsedTimeInSec, &heroParam);
@@ -96,7 +102,7 @@ void GSEGame::Update(float elapsedTimeInSec, GSEInputs* inputs)
 	}
 }
 
-bool GSEGame::AABBCollision(GSEObject* a, GSEObject* b)
+bool GSEGame::AABBCollsion(GSEObject* a, GSEObject* b)
 {
 	GSEObjectType aType;
 	GSEObjectType bType;
@@ -133,23 +139,19 @@ bool GSEGame::AABBCollision(GSEObject* a, GSEObject* b)
 	return true;
 }
 
-bool GSEGame::ProcessCollision(GSEObject* a, GSEObject* b)
+void GSEGame::ProcessCollision(GSEObject* a, GSEObject* b)
 {
-	GSEObjectType aType, bType;
-	a->GetType(&aType);
-	b->GetType(&bType);
-
-	bool isCollide = AABBCollision(a, b);
-	if (isCollide)
+	if (AABBCollsion(a, b)) 
 	{
-		//do something
+		GSEObjectType aType, bType;
+		a->GetType(&aType);
+		b->GetType(&bType);
 		if (aType == GSEObjectType::TYPE_FIXED || bType == GSEObjectType::TYPE_FIXED)
 		{
 			a->SetState(GSEObjectState::STATE_GROUND);
 			b->SetState(GSEObjectState::STATE_GROUND);
 		}
 	}
-	return isCollide;
 }
 
 void GSEGame::AdjustPosition(GSEObject* a, GSEObject* b)
@@ -212,53 +214,24 @@ void GSEGame::AdjustPosition(GSEObject* a, GSEObject* b)
 	{
 		if (bMaxY > aMaxY)
 		{
-			if (bMaxY > aMaxY)
-			{
-				bY = bY + (aMaxY - bMinY);
+			bY = bY + (aMaxY - bMinY);
 
-				b->SetPosition(bX, bY, 0.f);
-				float vx, vy;
-				b->GetVel(&vx, &vy);
-				b->SetVel(vx, 0.f);
-			}
-			else
-			{
-				bY = bY - (bMaxY - aMinY);
+			b->SetPosition(bX, bY, 0.f);
 
-				b->SetPosition(bX, bY, 0.f);
-				float vx, vy;
-				b->GetVel(&vx, &vy);
-				b->SetVel(vx, 0.f);
-			}
+			float vx, vy;
+
+			b->GetVel(&vx, &vy);
+			b->SetVel(vx, 0.f);
 		}
-	}
-}
+		else {
+			bY = bY - (bMaxY - aMinY);
 
-void GSEGame::RenderScene()
-{
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glClearColor(0.0f, 0.3f, 0.3f, 1.0f);
+			b->SetPosition(bX, bY, 0.f);
 
-	// Renderer Test
-	//m_renderer->DrawSolidRect(0, 0, 0, 100, 1, 0, 1, 1);
+			float vx, vy;
 
-	//Draw All Objects
-	for (int i = 0; i < GSE_MAX_OBJECTS; i++)
-	{
-		if (m_Objects[i] != NULL)
-		{
-			float x, y, depth;
-			m_Objects[i]->GetPosition(&x, &y, &depth);
-			float sx, sy;
-			m_Objects[i]->GetSize(&sx, &sy);
-
-			//meter to pixel
-			x = x * 100.f;
-			y = y * 100.f;
-			sx = sx * 100.f;
-			sy = sy * 100.f;
-
-			m_renderer->DrawSolidRect(x, y, depth, sx, sy, 1, 0, 1, 1);
+			b->GetVel(&vx, &vy);
+			b->SetVel(vx, 0.f);
 		}
 	}
 }

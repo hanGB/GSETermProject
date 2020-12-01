@@ -12,43 +12,29 @@ but WITHOUT ANY WARRANTY.
 #include <iostream>
 #include "Dependencies\glew.h"
 #include "Dependencies\freeglut.h"
+
 #include "GSEGame.h"
-
-GSEGame* g_game = NULL;
 GSEInputs g_inputs;
-bool g_focused = true;
 
+GSEGame* g_GSEGame = NULL;
 int g_prevTimeInMillisecond = 0;
 
 void RenderScene(int temp)
 {
 	int currentTime = glutGet(GLUT_ELAPSED_TIME);
-	int elapsedTime = currentTime-g_prevTimeInMillisecond;
+	int elapsedTime = currentTime - g_prevTimeInMillisecond;
 	g_prevTimeInMillisecond = currentTime;
 	float elapsedTimeInSec = (float)elapsedTime / 1000.f;
 
 	GSEInputs tempInputs;
 	memcpy(&tempInputs, &g_inputs, sizeof(GSEInputs));
 
-	if (g_focused)
-	{
-		g_game->Update(elapsedTimeInSec, &tempInputs);
-		g_game->RenderScene();
-	}
+	g_GSEGame->Update(elapsedTimeInSec, &tempInputs);
+	g_GSEGame->RenderScene();
 
-	glutSwapBuffers(); //double buffering, front->back, back->front
+	glutSwapBuffers();
 
 	glutTimerFunc(16, RenderScene, 16);
-}
-
-void Display(void)
-{
-	g_focused = true;
-}
-
-void Reshape(int width, int height)
-{
-	g_focused = false;
 }
 
 void Idle(void)
@@ -61,7 +47,7 @@ void MouseInput(int button, int state, int x, int y)
 
 void KeyDownInput(unsigned char key, int x, int y)
 {
-	switch (key)
+	switch (key) 
 	{
 	case 'w' | 'W':
 		g_inputs.KEY_W = true;
@@ -106,7 +92,7 @@ void SpecialKeyDownInput(int key, int x, int y)
 		break;
 	case GLUT_KEY_DOWN:
 		g_inputs.ARROW_DOWN = true;
-		break;
+		break; 
 	case GLUT_KEY_LEFT:
 		g_inputs.ARROW_LEFT = true;
 		break;
@@ -135,7 +121,7 @@ void SpecialKeyUpInput(int key, int x, int y)
 	}
 }
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
 	// Initialize GL things
 	glutInit(&argc, argv);
@@ -154,13 +140,12 @@ int main(int argc, char **argv)
 		std::cout << "GLEW 3.0 not supported\n ";
 	}
 
-	g_game = new GSEGame();
+	g_GSEGame = new GSEGame();
 
-	//Init g_inputs
+	// Init g_inputs
 	memset(&g_inputs, 0, sizeof(GSEInputs));
 
-	glutDisplayFunc(Display);
-	glutReshapeFunc(Reshape);
+	glutDisplayFunc(Idle);
 	glutIdleFunc(Idle);
 	glutKeyboardFunc(KeyDownInput);
 	glutKeyboardUpFunc(KeyUpInput);
@@ -174,8 +159,8 @@ int main(int argc, char **argv)
 
 	glutMainLoop();
 
-	delete g_game;
+	delete g_GSEGame;
 
-    return 0;
+	return 0;
 }
 

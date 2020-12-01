@@ -20,8 +20,8 @@ public:
 	void Update(float elapsedTimeInSec, GSEInputs* inputs);
 
 private:
-	bool AABBCollision(GSEObject* a, GSEObject* b);
-	bool ProcessCollision(GSEObject* a, GSEObject* b);
+	bool AABBCollsion(GSEObject* a, GSEObject* b);
+	void ProcessCollision(GSEObject* a, GSEObject* b);
 	void AdjustPosition(GSEObject* a, GSEObject* b);
 
 	Renderer* m_renderer = NULL;
