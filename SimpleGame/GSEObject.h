@@ -40,6 +40,8 @@ public:
 	bool GetApplyPhysics();
 	float GetRemainingCoolTime();
 	bool GetStickToParent();
+	void SetTextureID(int id);
+	int GetTextureID();
 
 private:
 	float m_PositionX, m_PositionY;
@@ -50,13 +52,14 @@ private:
 	float m_VelX, m_VelY;
 	float m_AccX, m_AccY;
 	float m_Mass;
-	int m_Parent;
+	int m_Parent; //hero id, npc id
 	float m_LifeTime;
 	float m_Life;
 	bool m_ApplyPhysics;
 	float m_CoolTime;
 	float m_RemainingCoolTime;
 	bool m_StickToParent;
+	int m_TextureID;
 
 	GSEObjectState m_State;
 	GSEObjectType m_Type;

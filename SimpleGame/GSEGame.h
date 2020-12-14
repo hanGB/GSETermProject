@@ -27,5 +27,9 @@ private:
 	Renderer* m_renderer = NULL;
 	GSEObject* m_Objects[GSE_MAX_OBJECTS];
 	int m_HeroID = -1;
+
+	int m_HeroTexture = -1;
+	int m_BrickTexture = -1;
+	int m_SpriteTexture = -1;
 };
 

@@ -21,11 +21,12 @@ GSEObject::GSEObject()
 
 	m_Parent = -1;
 	m_LifeTime = 0.f;
-	m_Life = 0.f;
+	m_Life = 0.f; //health point, HP
 	m_ApplyPhysics = false;
 	m_CoolTime = 0.3f;
 	m_RemainingCoolTime = m_CoolTime;
 	m_StickToParent = false;
+	m_TextureID = -1;
 
 	m_State = GSEObjectState::STATE_FALLING;
 	m_Type = GSEObjectType::TYPE_MOVABLE;
@@ -34,6 +35,16 @@ GSEObject::GSEObject()
 GSEObject::~GSEObject()
 {
 
+}
+
+void GSEObject::SetTextureID(int id)
+{
+	m_TextureID = id;
+}
+
+int GSEObject::GetTextureID()
+{
+	return m_TextureID;
 }
 
 void GSEObject::Update(float elapsedTimeInSec, GSEUpdateParams* param)
@@ -254,7 +265,7 @@ void GSEObject::GetState(GSEObjectState* state)
 
 int GSEObject::GetParentID()
 {
-	return 0;
+	return m_Parent;
 }
 
 float GSEObject::GetLife()

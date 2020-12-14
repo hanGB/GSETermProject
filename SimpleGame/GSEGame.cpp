@@ -12,24 +12,31 @@ GSEGame::GSEGame()
 		m_Objects[i] = NULL;
 	}
 
+	m_HeroTexture = m_renderer->GenPngTexture("a.png"); //재사용 가능!!
+	m_BrickTexture = m_renderer->GenPngTexture("brick.png"); //재사용 가능!!
+	m_SpriteTexture = m_renderer->GenPngTexture("spriteSheet.png"); //재사용 가능!!
+
 	//Create Hero
 	m_HeroID = AddObject(0, 0, 0, 1, 1, 0, 0, 0, 0, 20);
 	m_Objects[m_HeroID]->SetType(GSEObjectType::TYPE_HERO); 
 	m_Objects[m_HeroID]->SetApplyPhysics(true);
 	m_Objects[m_HeroID]->SetLife(100000000.f);
 	m_Objects[m_HeroID]->SetLifeTime(100000000.f);
+	m_Objects[m_HeroID]->SetTextureID(m_SpriteTexture);
 
 	int floor = AddObject(-1.25, -2.5, 0, 2, 0.3, 0, 0, 0, 0, 10000);
 	m_Objects[floor]->SetType(GSEObjectType::TYPE_FIXED);
 	m_Objects[floor]->SetApplyPhysics(true);
 	m_Objects[floor]->SetLife(100000000.f);
 	m_Objects[floor]->SetLifeTime(100000000.f);
+	//m_Objects[floor]->SetTextureID(m_BrickTexture);
+
 	floor = AddObject(+1.25, 0, 0, 1, 0.3, 0, 0, 0, 0, 10000);
 	m_Objects[floor]->SetType(GSEObjectType::TYPE_FIXED);
 	m_Objects[floor]->SetApplyPhysics(true);
 	m_Objects[floor]->SetLife(100000000.f);
 	m_Objects[floor]->SetLifeTime(100000000.f);
-
+	//m_Objects[floor]->SetTextureID(m_BrickTexture);
 }
 
 GSEGame::~GSEGame()
@@ -94,7 +101,7 @@ void GSEGame::Update(float elapsedTimeInSec, GSEInputs* inputs)
 			m_Objects[swordID]->SetRelPosition(norDirX, norDirY, 0.f);
 			m_Objects[swordID]->SetStickToParent(true);
 			m_Objects[swordID]->SetLife(100.f);
-			m_Objects[swordID]->SetLifeTime(0.3f);
+			m_Objects[swordID]->SetLifeTime(0.3f); //0.3 초 후 자동 삭제.
 			m_Objects[m_HeroID]->ResetRemainingCoolTime();
 		}
 	}
@@ -326,6 +333,8 @@ void GSEGame::DoGarbageCollect()
 	}
 }
 
+int temp = 0;
+
 void GSEGame::RenderScene()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -344,13 +353,37 @@ void GSEGame::RenderScene()
 			float sx, sy;
 			m_Objects[i]->GetSize(&sx, &sy);
 
+			int textureID = m_Objects[i]->GetTextureID();
+
 			//meter to pixel
 			x = x * 100.f;
 			y = y * 100.f;
 			sx = sx * 100.f;
 			sy = sy * 100.f;
 
-			m_renderer->DrawSolidRect(x, y, depth, sx, sy, 0.f, 1, 0, 1, 1);
+			if (textureID < 0)
+			{
+				m_renderer->DrawSolidRect(x, y, depth, sx, sy, 0.f, 1, 0, 1, 1);
+			}
+			else
+			{
+				/*m_renderer->DrawTextureRect(
+					x, y, depth,
+					sx, sy, 1.f,
+					1.f, 1.f, 1.f, 1.f,
+					textureID);*/
+				m_renderer->DrawTextureRectAnim(
+					x, y, depth,
+					sx, sy, 1.f,
+					1.f, 1.f, 1.f, 1.f,
+					textureID,
+					12,
+					12,
+					temp,
+					0);
+				temp++;
+				temp = temp % 12;
+			}
 		}
 	}
 }
