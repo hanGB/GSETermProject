@@ -1,22 +1,35 @@
 #include "stdafx.h"
 #include "GSEGame.h"
+#include "math.h"
 
 GSEGame::GSEGame()
 {
-	// initialize renderer
-	m_renderer	= new Renderer(500, 500);
-	for (int i = 0; i < GSE_MAX_OBJECTS; ++i) {
+	//Renderer initialize
+	m_renderer = new Renderer(500, 500);
+
+	for (int i = 0; i < GSE_MAX_OBJECTS; i++)
+	{
 		m_Objects[i] = NULL;
 	}
 
-	// Create Hero
+	//Create Hero
 	m_HeroID = AddObject(0, 0, 0, 1, 1, 0, 0, 0, 0, 20);
-	m_Objects[m_HeroID]->SetType(GSEObjectType::TYPE_HERO);
+	m_Objects[m_HeroID]->SetType(GSEObjectType::TYPE_HERO); 
+	m_Objects[m_HeroID]->SetApplyPhysics(true);
+	m_Objects[m_HeroID]->SetLife(100000000.f);
+	m_Objects[m_HeroID]->SetLifeTime(100000000.f);
 
 	int floor = AddObject(-1.25, -2.5, 0, 2, 0.3, 0, 0, 0, 0, 10000);
 	m_Objects[floor]->SetType(GSEObjectType::TYPE_FIXED);
+	m_Objects[floor]->SetApplyPhysics(true);
+	m_Objects[floor]->SetLife(100000000.f);
+	m_Objects[floor]->SetLifeTime(100000000.f);
 	floor = AddObject(+1.25, 0, 0, 1, 0.3, 0, 0, 0, 0, 10000);
 	m_Objects[floor]->SetType(GSEObjectType::TYPE_FIXED);
+	m_Objects[floor]->SetApplyPhysics(true);
+	m_Objects[floor]->SetLife(100000000.f);
+	m_Objects[floor]->SetLifeTime(100000000.f);
+
 }
 
 GSEGame::~GSEGame()
@@ -26,12 +39,15 @@ GSEGame::~GSEGame()
 
 void GSEGame::Update(float elapsedTimeInSec, GSEInputs* inputs)
 {
+	//do garbage collecting
+	DoGarbageCollect();
+
 	GSEUpdateParams othersParam;
 	GSEUpdateParams heroParam;
 	memset(&othersParam, 0, sizeof(GSEUpdateParams));
 	memset(&heroParam, 0, sizeof(GSEUpdateParams));
 
-	// calc force
+	//calc force
 	float forceAmount = 400.f;
 	if (inputs->KEY_W)
 	{
@@ -39,15 +55,48 @@ void GSEGame::Update(float elapsedTimeInSec, GSEInputs* inputs)
 	}
 	if (inputs->KEY_A)
 	{
-		heroParam.forceX += -forceAmount;
+		heroParam.forceX -= forceAmount;
 	}
 	if (inputs->KEY_S)
 	{
-		heroParam.forceY += -forceAmount;
+		heroParam.forceY -= forceAmount;
 	}
 	if (inputs->KEY_D)
 	{
 		heroParam.forceX += forceAmount;
+	}
+
+	//sword
+	float swordPosX = 0.f;
+	float swordPosY = 0.f;
+
+	if (inputs->ARROW_LEFT) swordPosX += -1.f;
+	if (inputs->ARROW_RIGHT) swordPosX += 1.f;
+	if (inputs->ARROW_DOWN) swordPosY += -1.f;
+	if (inputs->ARROW_UP) swordPosY += 1.f;
+	float swordDirSize = sqrtf(swordPosX * swordPosX + swordPosY * swordPosY);
+	if (swordDirSize > 0.f)
+	{
+		float norDirX = swordPosX / swordDirSize;
+		float norDirY = swordPosY / swordDirSize;
+
+		float aX, aY, asX, asY;
+		float bX, bY, bsX, bsY;
+		float temp;
+
+		m_Objects[m_HeroID]->GetPosition(&aX, &aY, &temp);
+		m_Objects[m_HeroID]->GetSize(&asX, &asY);
+
+		if (m_Objects[m_HeroID]->GetRemainingCoolTime() < 0.f)
+		{
+			int swordID = AddObject(0.f, 0.f, 0.f, 1.f, 1.f, 0.f, 0.f, 0.f, 0.f, 1.f);
+			m_Objects[swordID]->SetParentID(m_HeroID);
+			m_Objects[swordID]->SetRelPosition(norDirX, norDirY, 0.f);
+			m_Objects[swordID]->SetStickToParent(true);
+			m_Objects[swordID]->SetLife(100.f);
+			m_Objects[swordID]->SetLifeTime(0.3f);
+			m_Objects[m_HeroID]->ResetRemainingCoolTime();
+		}
 	}
 
 	//Processing collision
@@ -57,7 +106,9 @@ void GSEGame::Update(float elapsedTimeInSec, GSEInputs* inputs)
 	{
 		for (int j = i + 1; j < GSE_MAX_OBJECTS; j++)
 		{
-			if (m_Objects[i] != NULL && m_Objects[j] != NULL)
+			if (m_Objects[i] != NULL && m_Objects[j] != NULL
+				&&
+				m_Objects[i]->GetApplyPhysics() && m_Objects[j]->GetApplyPhysics())
 			{
 				bool collide = ProcessCollision(m_Objects[i], m_Objects[j]);
 				if (collide)
@@ -89,11 +140,42 @@ void GSEGame::Update(float elapsedTimeInSec, GSEInputs* inputs)
 			}
 			else
 			{
-				m_Objects[i]->Update(elapsedTimeInSec, &othersParam);
+				if (m_Objects[i]->GetStickToParent())
+				{
+					float posX, posY, depth;
+					float relPosX, relPosY, relDepth;
+					int parentID = m_Objects[i]->GetParentID();
+					m_Objects[parentID]->GetPosition(&posX, &posY, &depth);
+					m_Objects[i]->GetRelPosition(&relPosX, &relPosY, &relDepth);
+					m_Objects[i]->SetPosition(posX + relPosX, posY + relPosY, depth + relDepth);
+					m_Objects[i]->Update(elapsedTimeInSec, &othersParam);
+				}
+				else
+				{
+					m_Objects[i]->Update(elapsedTimeInSec, &othersParam);
+				}
 			}
-			
 		}
 	}
+}
+
+bool GSEGame::ProcessCollision(GSEObject* a, GSEObject* b)
+{
+	GSEObjectType aType, bType;
+	a->GetType(&aType);
+	b->GetType(&bType);
+
+	bool isCollide = AABBCollision(a, b);
+	if (isCollide)
+	{
+		//do something
+		if (aType == GSEObjectType::TYPE_FIXED || bType == GSEObjectType::TYPE_FIXED)
+		{
+			a->SetState(GSEObjectState::STATE_GROUND);
+			b->SetState(GSEObjectState::STATE_GROUND);
+		}
+	}
+	return isCollide;
 }
 
 bool GSEGame::AABBCollision(GSEObject* a, GSEObject* b)
@@ -124,32 +206,25 @@ bool GSEGame::AABBCollision(GSEObject* a, GSEObject* b)
 	bMinY = bY - bsY / 2.f;
 	bMaxY = bY + bsY / 2.f;
 
-	if (aMinX > bMaxX) return false;
-	if (aMaxX < bMinX) return false;
-	if (aMinY > bMaxY) return false;
-	if (aMaxY < bMinY) return false;
+	if (aMinX > bMaxX) // || fabs(aMinX-bMaxX)<FLT_EPSILON
+	{
+		return false;
+	}
+	if (aMaxX < bMinX)
+	{
+		return false;
+	}
+	if (aMinY > bMaxY)
+	{
+		return false;
+	}
+	if (aMaxY < bMinY)
+	{
+		return false;
+	}
 
 	AdjustPosition(a, b);
 	return true;
-}
-
-bool GSEGame::ProcessCollision(GSEObject* a, GSEObject* b)
-{
-	GSEObjectType aType, bType;
-	a->GetType(&aType);
-	b->GetType(&bType);
-
-	bool isCollide = AABBCollision(a, b);
-	if (isCollide)
-	{
-		//do something
-		if (aType == GSEObjectType::TYPE_FIXED || bType == GSEObjectType::TYPE_FIXED)
-		{
-			a->SetState(GSEObjectState::STATE_GROUND);
-			b->SetState(GSEObjectState::STATE_GROUND);
-		}
-	}
-	return isCollide;
 }
 
 void GSEGame::AdjustPosition(GSEObject* a, GSEObject* b)
@@ -191,26 +266,27 @@ void GSEGame::AdjustPosition(GSEObject* a, GSEObject* b)
 			a->SetPosition(aX, aY, 0.f);
 
 			float vx, vy;
-
 			a->GetVel(&vx, &vy);
 			a->SetVel(vx, 0.f);
 		}
-		else {
+		else
+		{
 			aY = aY - (aMaxY - bMinY);
 
 			a->SetPosition(aX, aY, 0.f);
 
 			float vx, vy;
-
 			a->GetVel(&vx, &vy);
 			a->SetVel(vx, 0.f);
 		}
 	}
-	else if ((bType == GSEObjectType::TYPE_MOVABLE || bType == GSEObjectType::TYPE_HERO)
+	else if (
+		(bType == GSEObjectType::TYPE_MOVABLE || bType == GSEObjectType::TYPE_HERO)
 		&&
-		aType == GSEObjectType::TYPE_FIXED)
+		(aType == GSEObjectType::TYPE_FIXED)
+		)
 	{
-		if (bMaxY > aMaxY)
+		if (!(bMaxY > aMaxY && bMinY < aMinY))
 		{
 			if (bMaxY > aMaxY)
 			{
@@ -229,6 +305,22 @@ void GSEGame::AdjustPosition(GSEObject* a, GSEObject* b)
 				float vx, vy;
 				b->GetVel(&vx, &vy);
 				b->SetVel(vx, 0.f);
+			}
+		}
+	}
+}
+
+void GSEGame::DoGarbageCollect()
+{
+	for (int i = 0; i < GSE_MAX_OBJECTS; i++)
+	{
+		if (m_Objects[i] != NULL)
+		{
+			float life = m_Objects[i]->GetLife();
+			float lifeTime = m_Objects[i]->GetLifeTime();
+			if (life < 0.f || lifeTime < 0.f)
+			{
+				DeleteObject(i);
 			}
 		}
 	}
@@ -258,28 +350,31 @@ void GSEGame::RenderScene()
 			sx = sx * 100.f;
 			sy = sy * 100.f;
 
-			m_renderer->DrawSolidRect(x, y, depth, sx, sy, 1, 0, 1, 1);
+			m_renderer->DrawSolidRect(x, y, depth, sx, sy, 0.f, 1, 0, 1, 1);
 		}
 	}
 }
 
-
-int GSEGame::AddObject(float x, float y, float depth,
+int GSEGame::AddObject(float x, float y, float depth, 
 	float sx, float sy,
 	float velX, float velY,
 	float accX, float accY,
 	float mass)
 {
-	// find empty slot
+	//find empty slot
 	int index = -1;
-	for (int i = 0; i < GSE_MAX_OBJECTS; ++i) {
-		if (m_Objects[i] == NULL) {
+	for (int i = 0; i < GSE_MAX_OBJECTS; i++)
+	{
+		if (m_Objects[i] == NULL)
+		{
 			index = i;
 			break;
 		}
 	}
-	if (index < 0) {
-		std::cout << "No empty object slot.." << std::endl;
+
+	if (index < 0)
+	{
+		std::cout << "No empty object slot.. " << std::endl;
 		return -1;
 	}
 
@@ -295,11 +390,13 @@ int GSEGame::AddObject(float x, float y, float depth,
 
 void GSEGame::DeleteObject(int index)
 {
-	if (m_Objects[index] != NULL) {
+	if (m_Objects[index] != NULL)
+	{
 		delete m_Objects[index];
 		m_Objects[index] = NULL;
 	}
-	else {
-		std::cout << "Try to delete NULL Object : " << index << std::endl;
+	else
+	{
+		std::cout << "Try to delete NULL object : " << index << std::endl;
 	}
 }

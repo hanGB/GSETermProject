@@ -1,33 +1,53 @@
 #include "stdafx.h"
 #include "GSEObject.h"
-#include "GSEGlobals.h"
 #include "math.h"
+#include <iostream>
 
 
 GSEObject::GSEObject()
 {
-	m_PositionX		= GSE_NULL_VAL;
-	m_PositionY		= GSE_NULL_VAL;
-	m_Depth			= GSE_NULL_VAL;
-	m_SizeX			= GSE_NULL_VAL;
-	m_SizeY			= GSE_NULL_VAL;
-	m_AccX			= GSE_NULL_VAL;
-	m_AccY			= GSE_NULL_VAL;
-	m_VelX			= GSE_NULL_VAL;
-	m_VelY			= GSE_NULL_VAL;
-	m_Mass			= GSE_NULL_VAL;
+	m_PositionX = -1000000;
+	m_PositionY = -1000000;
+	m_RelPositionX = -1000000;
+	m_RelPositionY = -1000000;
+	m_Depth = -1000000;
+	m_SizeX = -1000000;
+	m_SizeY = -1000000;
+	m_AccX = -1000000;
+	m_AccY = -1000000;
+	m_VelX = -1000000;
+	m_VelY = -1000000;
+	m_Mass = -1000000;
 
-	m_State			= GSEObjectState::STATE_FALLING;
-	m_Type			= GSEObjectType::TYPE_MOVABLE;
+	m_Parent = -1;
+	m_LifeTime = 0.f;
+	m_Life = 0.f;
+	m_ApplyPhysics = false;
+	m_CoolTime = 0.3f;
+	m_RemainingCoolTime = m_CoolTime;
+	m_StickToParent = false;
+
+	m_State = GSEObjectState::STATE_FALLING;
+	m_Type = GSEObjectType::TYPE_MOVABLE;
 }
 
 GSEObject::~GSEObject()
 {
+
 }
 
 void GSEObject::Update(float elapsedTimeInSec, GSEUpdateParams* param)
 {
+	m_RemainingCoolTime -= elapsedTimeInSec;
+	m_LifeTime -= elapsedTimeInSec;
+
 	if (m_Type != GSEObjectType::TYPE_MOVABLE && m_Type != GSEObjectType::TYPE_HERO)
+		return;
+
+	if (!m_ApplyPhysics)
+		return;
+
+	if (m_StickToParent)
 		return;
 
 	float t = elapsedTimeInSec;
@@ -93,32 +113,59 @@ void GSEObject::Update(float elapsedTimeInSec, GSEUpdateParams* param)
 
 void GSEObject::SetPosition(float x, float y, float depth)
 {
-	m_PositionX		= x;
-	m_PositionY		= y;
-	m_Depth			= depth;
+	m_PositionX = x;
+	m_PositionY = y;
+	m_Depth = depth;
+}
+
+void GSEObject::SetRelPosition(float x, float y, float depth)
+{
+	m_RelPositionX = x;
+	m_RelPositionY = y;
+	m_RelDepth = depth;
+}
+
+void GSEObject::GetPosition(float* x, float* y, float* depth)
+{
+	*x = m_PositionX;
+	*y = m_PositionY;
+	*depth = m_Depth;
+}
+
+void GSEObject::GetRelPosition(float* x, float* y, float* depth)
+{
+	*x = m_RelPositionX;
+	*y = m_RelPositionY;
+	*depth = m_RelDepth;
 }
 
 void GSEObject::SetSize(float sx, float sy)
 {
-	m_SizeX			= sx;
-	m_SizeY			= sy;
+	m_SizeX = sx;
+	m_SizeY = sy;
+}
+
+void GSEObject::GetSize(float* sx, float* sy)
+{
+	*sx = m_SizeX;
+	*sy = m_SizeY;
 }
 
 void GSEObject::SetVel(float x, float y)
 {
-	m_VelX			= x;
-	m_VelY			= y;
+	m_VelX = x;
+	m_VelY = y;
 }
 
 void GSEObject::SetAcc(float x, float y)
 {
-	m_AccX			= x;
-	m_AccY			= y;
+	m_AccX = x;
+	m_AccY = y;
 }
 
 void GSEObject::SetMass(float x)
 {
-	m_Mass			= x;
+	m_Mass = x;
 }
 
 void GSEObject::SetType(GSEObjectType type)
@@ -131,34 +178,68 @@ void GSEObject::SetState(GSEObjectState state)
 	m_State = state;
 }
 
-void GSEObject::GetPosition(float* x, float* y, float* depth)
+void GSEObject::SetParentID(int parentID)
 {
-	*x				= m_PositionX;
-	*y				= m_PositionY;
-	*depth			= m_Depth;
+	m_Parent = parentID;
 }
 
-void GSEObject::GetSize(float* sx, float* sy)
+void GSEObject::SetLifeTime(float lifeTime)
 {
-	*sx				= m_SizeX;
-	*sy				= m_SizeY;
+	m_LifeTime = lifeTime;
+}
+
+void GSEObject::SetLife(float life)
+{
+	m_Life = life;
+}
+
+void GSEObject::SetApplyPhysics(bool bPhy)
+{
+	m_ApplyPhysics = bPhy;
+}
+
+void GSEObject::SetCoolTime(float coolTime)
+{
+	m_CoolTime = coolTime;
+}
+
+void GSEObject::ResetRemainingCoolTime()
+{
+	m_RemainingCoolTime = m_CoolTime;
+}
+
+void GSEObject::SetStickToParent(bool bStick)
+{
+	if (m_Parent < 0)
+	{
+		std::cout << "This object has no parent" << std::endl;
+		return;
+	}
+
+	if (m_StickToParent && !bStick)
+	{
+		m_PositionX = m_PositionX + m_RelPositionX;
+		m_PositionY = m_PositionY + m_RelPositionY;
+	}
+
+	m_StickToParent = bStick;
 }
 
 void GSEObject::GetVel(float* x, float* y)
 {
-	*x				= m_VelX;
-	*y				= m_VelY;
+	*x = m_VelX;
+	*y = m_VelY;
 }
 
 void GSEObject::GetAcc(float* x, float* y)
 {
-	*x				= m_AccX;
-	*y				= m_AccY;
+	*x = m_AccX;
+	*y = m_AccY;
 }
 
 void GSEObject::GetMass(float* x)
 {
-	*x				= m_Mass;
+	*x = m_Mass;
 }
 
 void GSEObject::GetType(GSEObjectType* type)
@@ -169,4 +250,34 @@ void GSEObject::GetType(GSEObjectType* type)
 void GSEObject::GetState(GSEObjectState* state)
 {
 	*state = m_State;
+}
+
+int GSEObject::GetParentID()
+{
+	return 0;
+}
+
+float GSEObject::GetLife()
+{
+	return 0.0f;
+}
+
+float GSEObject::GetLifeTime()
+{
+	return m_LifeTime;
+}
+
+bool GSEObject::GetApplyPhysics()
+{
+	return m_ApplyPhysics;
+}
+
+float GSEObject::GetRemainingCoolTime()
+{
+	return m_RemainingCoolTime;
+}
+
+bool GSEObject::GetStickToParent()
+{
+	return m_StickToParent;
 }

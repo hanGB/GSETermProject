@@ -1,8 +1,6 @@
 #pragma once
 
 #define GSE_MAX_OBJECTS 1000
-#define GSE_NULL_VAL -1000000
-
 #define GSE_GRAVITY 9.8f
 
 typedef struct GSEInputs
