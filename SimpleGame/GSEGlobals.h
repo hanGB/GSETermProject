@@ -3,6 +3,9 @@
 #define GSE_MAX_OBJECTS 1000
 #define GSE_GRAVITY 9.8f
 
+#define GSE_WINDOWSIZE_X 1280
+#define GSE_WINDOWSIZE_Y 720
+
 typedef struct GSEInputs
 {
 	bool ARROW_UP;
