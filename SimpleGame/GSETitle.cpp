@@ -4,6 +4,8 @@
 
 GSETitle::GSETitle()
 {
+	m_bNextState = false;
+
 	m_time = 1;
 	m_grassAnimationTime = 0;
 	m_grassAnimationFrame = 0;
@@ -12,6 +14,10 @@ GSETitle::GSETitle()
 	m_TitleLogoTexture = getRenderer()->GenPngTexture("./resource/image/title/titleLogo.png");
 	m_TitleGrassTexture = getRenderer()->GenPngTexture("./resource/image/title/titleGrass.png");
 	m_TitlePressKeyTexture = getRenderer()->GenPngTexture("./resource/image/title/titlePressKey.png");
+
+	m_RainParticleTexture = getRenderer()->GenPngTexture("./resource/image/particle/rainParticle.png");
+
+	m_RainParticle = getRenderer()->CreateParticleObject(100, -1280, -720, 1280, 720, 100, 100, 300, 300, 0, -100, 0, -100);
 
 	m_grassID = AddObject(0, -300, 1, 1280, 690, 0, 0, 0, 0, 10000);
 	getObject(m_grassID)->SetType(GSEObjectType::TYPE_FIXED);
@@ -26,10 +32,17 @@ GSETitle::GSETitle()
 	getObject(m_pressKeyID)->SetLife(100000000.f);
 	getObject(m_pressKeyID)->SetLifeTime(100000000.f);
 	getObject(m_pressKeyID)->SetTextureID(m_TitlePressKeyTexture);
+
+	m_RainSound = getSound()->CreateBGSound("./resource/sound/bg/rainSound.wav");
+	m_SwordSound = getSound()->CreateShortSound("./resource/sound/short/swordSound.wav");
+	getSound()->PlayBGSound(m_RainSound, true, 1.f);
 }
 
 GSETitle::~GSETitle()
 {
+	getSound()->StopBGSound(m_RainSound);
+	getSound()->DeleteBGSound(m_RainSound);
+	getSound()->DeleteShortSound(m_SwordSound);
 }
 
 void GSETitle::Update(float elapsedTimeInSec, GSEInputs* inputs)
@@ -40,6 +53,13 @@ void GSETitle::Update(float elapsedTimeInSec, GSEInputs* inputs)
 	}
 	else {
 		m_time += elapsedTimeInSec;
+
+		if (!m_bNextState) {
+			if (inputs->KEY_ENTER) {
+				getSound()->PlayShortSound(m_SwordSound, false, 1.f);
+				m_bNextState = true;
+			}
+		}
 	}
 	m_grassAnimationTime = m_grassAnimationTime + 0.2 * 12 * elapsedTimeInSec;
 	m_grassAnimationFrame = (int)m_grassAnimationTime % 12;
@@ -88,4 +108,12 @@ void GSETitle::RenderScene()
 
 		}
 	}
+
+	getRenderer()->DrawParticle(m_RainParticle, 
+		0, 0, 0, 
+		1.f,
+		1, 1, 1, 1, 
+		0, -9.8 * m_time,
+		m_RainParticleTexture, 
+		1.f, m_time, 0.f);
 }

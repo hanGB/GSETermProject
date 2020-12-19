@@ -40,6 +40,11 @@ void RenderScene(int temp)
 		if (g_GameState == TITLE_STATE) {
 			g_title->Update(elapsedTimeInSec, &tempInputs);
 			g_title->RenderScene();
+
+			if (g_title->IsNextState()) {
+				g_GameState = GAMING_STATE;
+				delete g_title;
+			}
 		}
 		else if (g_GameState == GAMING_STATE) {
 			//g_game->Update(elapsedTimeInSec, &tempInputs);
@@ -89,6 +94,9 @@ void KeyDownInput(unsigned char key, int x, int y)
 	case 'd' | 'D':
 		g_inputs.KEY_D = true;
 		break;
+	case GLUT_KEY_ENTER:
+		g_inputs.KEY_ENTER = true;
+		break;
 	}
 }
 
@@ -107,6 +115,9 @@ void KeyUpInput(unsigned char key, int x, int y)
 		break;
 	case 'd' | 'D':
 		g_inputs.KEY_D = false;
+		break;
+	case GLUT_KEY_ENTER:
+		g_inputs.KEY_ENTER = false;
 		break;
 	}
 }

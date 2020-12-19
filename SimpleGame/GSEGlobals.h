@@ -1,5 +1,7 @@
 #pragma once
 
+#define GLUT_KEY_ENTER 13
+
 #define GSE_MAX_OBJECTS 1000
 #define GSE_GRAVITY 9.8f
 
@@ -21,6 +23,8 @@ typedef struct GSEInputs
 	bool KEY_A;
 	bool KEY_S;
 	bool KEY_D;
+
+	bool KEY_ENTER;
 };
 
 typedef struct GSEUpdateParams
