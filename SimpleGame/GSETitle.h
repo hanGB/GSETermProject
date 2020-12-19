@@ -14,7 +14,6 @@ class GSETitle : public GSEGame {
 	int m_RainParticle;
 
 	int m_RainSound;
-	int m_SwordSound;
 
 	int m_grassID;
 	int m_pressKeyID;

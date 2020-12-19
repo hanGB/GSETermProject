@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "GSETitle.h"
-#include <iostream>
+#include <Windows.h>
 
 GSETitle::GSETitle()
 {
@@ -34,7 +34,6 @@ GSETitle::GSETitle()
 	getObject(m_pressKeyID)->SetTextureID(m_TitlePressKeyTexture);
 
 	m_RainSound = getSound()->CreateBGSound("./resource/sound/bg/rainSound.wav");
-	m_SwordSound = getSound()->CreateShortSound("./resource/sound/short/swordSound.wav");
 	getSound()->PlayBGSound(m_RainSound, true, 1.f);
 }
 
@@ -42,7 +41,6 @@ GSETitle::~GSETitle()
 {
 	getSound()->StopBGSound(m_RainSound);
 	getSound()->DeleteBGSound(m_RainSound);
-	getSound()->DeleteShortSound(m_SwordSound);
 }
 
 void GSETitle::Update(float elapsedTimeInSec, GSEInputs* inputs)
@@ -56,7 +54,6 @@ void GSETitle::Update(float elapsedTimeInSec, GSEInputs* inputs)
 
 		if (!m_bNextState) {
 			if (inputs->KEY_ENTER) {
-				getSound()->PlayShortSound(m_SwordSound, false, 1.f);
 				m_bNextState = true;
 			}
 		}
