@@ -5,11 +5,15 @@ class GSEBattle : public GSEGame {
 
 	bool m_bNextState;
 
+	int m_NowMap;
+
 	int m_HeroTexture;
 	int m_SwordManTexture;
 	int m_GunManTexture;
-	int m_BrickTexture;
-	int m_BackGroundTexture;
+
+	int m_RailRoadMapTexture;
+	int m_FireMapTexture;
+	int m_FireMapFrontTexture;
 
 	int m_SwordSound; 
 	int m_TriggerSound;

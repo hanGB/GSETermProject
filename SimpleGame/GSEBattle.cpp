@@ -4,18 +4,20 @@
 GSEBattle::GSEBattle()
 {
 	m_bNextState = false;
-
+	m_NowMap = 0;
+	
 	m_SwordSound = getSound()->CreateShortSound("./resource/sound/short/swordSound.wav");
 	m_TriggerSound = getSound()->CreateShortSound("./resource/sound/short/triggerSound.wav");
 
 	m_HeroTexture = getRenderer()->GenPngTexture("./resource/image/battle/hero.png"); //재사용 가능!!
-	// m_BrickTexture = getRenderer()->GenPngTexture("brick.png"); //재사용 가능!!
 	m_SwordManTexture;
 	m_GunManTexture;
-	m_BackGroundTexture;
+
+	m_RailRoadMapTexture = getRenderer()->GenPngTexture("./resource/image/battle/mapRailLoad.png");
+	m_FireMapTexture = getRenderer()->GenPngTexture("./resource/image/battle/mapFire.png");
 
 	//Create Hero
-	m_HeroID = AddObject(0, 0, 0, 1, 1, 0, 0, 0, 0, 20);
+	m_HeroID = AddObject(0, 0, 0, 0.8, 1.6, 0, 0, 0, 0, 50);
 	getObject(m_HeroID)->SetType(GSEObjectType::TYPE_HERO);
 	getObject(m_HeroID)->SetApplyPhysics(true);
 	getObject(m_HeroID)->SetLife(100000000.f);
@@ -27,14 +29,18 @@ GSEBattle::GSEBattle()
 	getObject(floor)->SetApplyPhysics(true);
 	getObject(floor)->SetLife(100000000.f);
 	getObject(floor)->SetLifeTime(100000000.f);
-	//m_Objects[floor]->SetTextureID(m_BrickTexture);
 
 	floor = AddObject(+1.25, 0, 0, 1, 0.3, 0, 0, 0, 0, 10000);
 	getObject(floor)->SetType(GSEObjectType::TYPE_FIXED);
 	getObject(floor)->SetApplyPhysics(true);
 	getObject(floor)->SetLife(100000000.f);
 	getObject(floor)->SetLifeTime(100000000.f);
-	//m_Objects[floor]->SetTextureID(m_BrickTexture);
+
+	floor = AddObject(0, -3.6, 0, 67, 0.3, 0, 0, 0, 0, 10000);
+	getObject(floor)->SetType(GSEObjectType::TYPE_FIXED);
+	getObject(floor)->SetApplyPhysics(true);
+	getObject(floor)->SetLife(100000000.f);
+	getObject(floor)->SetLifeTime(100000000.f);
 
 	m_BackGroundSound = getSound()->CreateBGSound("./resource/sound/bg/battleSound.mp3");
 	
@@ -168,7 +174,6 @@ void GSEBattle::Update(float elapsedTimeInSec, GSEInputs* inputs)
 			}
 		}
 	}
-
 	float x, y, z;
 	getObject(m_HeroID)->GetPosition(&x, &y, &z);
 	getRenderer()->SetCameraPos(x * 100.f, y * 100.f);
@@ -180,7 +185,13 @@ void GSEBattle::RenderScene()
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
 	// Draw background
-	getRenderer()->DrawGround(0, 0, 0, 3840, 2160, 1, 1, 1, 1, 1, m_BackGroundTexture);
+	if (m_NowMap == RAILROAD_MAP) {
+		getRenderer()->DrawGround(0, 0, 0, 6721, -720, 1, 1, 1, 1, 1, m_RailRoadMapTexture);
+	}
+	else if (m_NowMap == FIRE_MAP) {
+		getRenderer()->DrawGround(0, 0, 0, 4661, -720, 1, 1, 1, 1, 1, m_FireMapTexture);
+	}
+	
 
 	//Draw All Objects
 	for (int i = 0; i < GSE_MAX_OBJECTS; i++)
@@ -226,7 +237,6 @@ void GSEBattle::RenderScene()
 					5,
 					0);
 			}
-
 		}
 	}
 }

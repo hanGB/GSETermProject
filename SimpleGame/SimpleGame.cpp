@@ -46,6 +46,12 @@ void RenderScene(int temp)
 				delete g_title;
 				g_battle = new GSEBattle();
 			}
+			
+			//Å×½ºÆ®
+			g_GameState = BATTLE_STATE;
+			delete g_title;
+			g_battle = new GSEBattle();
+			//
 		}
 		else if (g_GameState == BATTLE_STATE) {
 			g_battle->Update(elapsedTimeInSec, &tempInputs);

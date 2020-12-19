@@ -12,6 +12,9 @@
 #define BATTLE_STATE 1
 #define ENDING_STATE 2
 
+#define RAILROAD_MAP 0
+#define FIRE_MAP 1
+
 typedef struct GSEInputs
 {
 	bool ARROW_UP;
