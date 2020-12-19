@@ -25,12 +25,14 @@ public:
 	Sound* getSound();
 	GSEObject* getObject(int index);
 
-	bool AABBCollision(GSEObject* a, GSEObject* b);
-	bool ProcessCollision(GSEObject* a, GSEObject* b);
-	void AdjustPosition(GSEObject* a, GSEObject* b);
 	void DoGarbageCollect();
+	bool ProcessCollision(GSEObject* a, GSEObject* b);
+	
 
 private:
+	bool AABBCollision(GSEObject* a, GSEObject* b);
+	void AdjustPosition(GSEObject* a, GSEObject* b);
+
 	Renderer* m_renderer = NULL;
 	Sound* m_Sound = NULL;
 	GSEObject* m_Objects[GSE_MAX_OBJECTS];

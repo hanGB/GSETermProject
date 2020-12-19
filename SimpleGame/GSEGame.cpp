@@ -134,7 +134,7 @@ void GSEGame::AdjustPosition(GSEObject* a, GSEObject* b)
 
 	if ((aType == GSEObjectType::TYPE_MOVABLE || aType == GSEObjectType::TYPE_HERO)
 		&&
-		bType == GSEObjectType::TYPE_FIXED)
+		(bType == GSEObjectType::TYPE_FIXED || bType == GSEObjectType::TYPE_FIXED_UP))
 	{
 		if (aMaxY > bMaxY)
 		{
@@ -148,19 +148,21 @@ void GSEGame::AdjustPosition(GSEObject* a, GSEObject* b)
 		}
 		else
 		{
-			aY = aY - (aMaxY - bMinY);
+			if (bType != GSEObjectType::TYPE_FIXED_UP) {
+				aY = aY - (aMaxY - bMinY);
 
-			a->SetPosition(aX, aY, 0.f);
+				a->SetPosition(aX, aY, 0.f);
 
-			float vx, vy;
-			a->GetVel(&vx, &vy);
-			a->SetVel(vx, 0.f);
+				float vx, vy;
+				a->GetVel(&vx, &vy);
+				a->SetVel(vx, 0.f);
+			}
 		}
 	}
 	else if (
 		(bType == GSEObjectType::TYPE_MOVABLE || bType == GSEObjectType::TYPE_HERO)
 		&&
-		(aType == GSEObjectType::TYPE_FIXED)
+		(aType == GSEObjectType::TYPE_FIXED || aType == GSEObjectType::TYPE_FIXED_UP)
 		)
 	{
 		if (!(bMaxY > aMaxY && bMinY < aMinY))
@@ -176,12 +178,69 @@ void GSEGame::AdjustPosition(GSEObject* a, GSEObject* b)
 			}
 			else
 			{
-				bY = bY - (bMaxY - aMinY);
+				if (aType != GSEObjectType::TYPE_FIXED_UP) {
+					bY = bY - (bMaxY - aMinY);
+
+					b->SetPosition(bX, bY, 0.f);
+					float vx, vy;
+					b->GetVel(&vx, &vy);
+					b->SetVel(vx, 0.f);
+				}
+			}
+		}
+	}
+
+	// 벽(Wall)과 충돌 처리
+	else if ((aType == GSEObjectType::TYPE_MOVABLE || aType == GSEObjectType::TYPE_HERO)
+		&&
+		bType == GSEObjectType::TYPE_WALL)
+	{
+		if (aMaxX > bMaxX)
+		{
+			aX = aX + (bMaxX - aMinX);
+
+			a->SetPosition(aX, aY, 0.f);
+
+			float vx, vy;
+			a->GetVel(&vx, &vy);
+			a->SetVel(0.f, vy);
+		}
+		else
+		{
+			aX = aX - (aMaxX - bMinX);
+
+			a->SetPosition(aX, aY, 0.f);
+
+			float vx, vy;
+			a->GetVel(&vx, &vy);
+			a->SetVel(0.f, vy);
+		}
+	}
+	else if (
+		(bType == GSEObjectType::TYPE_MOVABLE || bType == GSEObjectType::TYPE_HERO)
+		&&
+		(aType == GSEObjectType::TYPE_WALL)
+		)
+	{
+		if (!(bMaxX > aMaxX && bMinX < aMinX))
+		{
+			if (bMaxX > aMaxX)
+			{
+				bX = bX + (aMaxX - bMinX);
 
 				b->SetPosition(bX, bY, 0.f);
 				float vx, vy;
 				b->GetVel(&vx, &vy);
-				b->SetVel(vx, 0.f);
+				b->SetVel(0.f, vy);
+			}
+			else
+			{
+				bX = bX - (bMaxX - aMinX);
+
+				b->SetPosition(bX, bY, 0.f);
+				float vx, vy;
+				b->GetVel(&vx, &vy);
+				b->SetVel(0.f, vy);
 			}
 		}
 	}

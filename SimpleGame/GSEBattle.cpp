@@ -51,22 +51,23 @@ void GSEBattle::Update(float elapsedTimeInSec, GSEInputs* inputs)
 	memset(&heroParam, 0, sizeof(GSEUpdateParams));
 
 	//calc force
-	float forceAmount = 800.f;
+	float forceAmountX = 800.f;
+	float forceAmountY = 600.f;
 	if (inputs->KEY_W)
 	{
-		heroParam.forceY += 20 * forceAmount;
+		heroParam.forceY += 20 * forceAmountY;
 	}
 	if (inputs->KEY_A)
 	{
-		heroParam.forceX -= forceAmount;
+		heroParam.forceX -= forceAmountX;
 	}
 	if (inputs->KEY_S)
 	{
-		heroParam.forceY -= forceAmount;
+		heroParam.forceY -= forceAmountX;
 	}
 	if (inputs->KEY_D)
 	{
-		heroParam.forceX += forceAmount;
+		heroParam.forceX += forceAmountY;
 	}
 
 	//sword
@@ -203,6 +204,7 @@ void GSEBattle::RenderScene()
 
 			if (textureID < 0)
 			{
+				// 충돌체 테스트 시 주석 해제
 				getRenderer()->DrawSolidRect(x, y, depth, sx, sy, 0.f, 1, 0, 1, 1);
 			}
 			else if (type == TYPE_FIXED) {
@@ -295,20 +297,20 @@ void GSEBattle::MakeStage(int map)
 		getObject(floor)->SetLife(100000000.f);
 		getObject(floor)->SetLifeTime(100000000.f);
 
-		floor = AddObject(28.2, 0.5, 0, 3.7, 0.25, 0, 0, 0, 0, 10000);
-		getObject(floor)->SetType(GSEObjectType::TYPE_WALL);
+		/*floor = AddObject(28.2, 0.5, 0, 3.7, 0.25, 0, 0, 0, 0, 10000);
+		getObject(floor)->SetType(GSEObjectType::TYPE_FIXED_UP);
 		getObject(floor)->SetApplyPhysics(true);
 		getObject(floor)->SetLife(100000000.f);
-		getObject(floor)->SetLifeTime(100000000.f);
+		getObject(floor)->SetLifeTime(100000000.f)*/;
 
 		//Create Wall
-		int wall = AddObject(33.5, 0, 0, 0.5, 7.2, 0, 0, 0, 0, 10000);
+		int wall = AddObject(33.8, 0, 0, 0.5, 7.2, 0, 0, 0, 0, 10000);
 		getObject(wall)->SetType(GSEObjectType::TYPE_WALL);
 		getObject(wall)->SetApplyPhysics(true);
 		getObject(wall)->SetLife(100000000.f);
 		getObject(wall)->SetLifeTime(100000000.f);
 
-		wall = AddObject(-33.5, 0, 0, 0.5, 7.2, 0, 0, 0, 0, 10000);
+		wall = AddObject(-33.8, 0, 0, 0.5, 7.2, 0, 0, 0, 0, 10000);
 		getObject(wall)->SetType(GSEObjectType::TYPE_WALL);
 		getObject(wall)->SetApplyPhysics(true);
 		getObject(wall)->SetLife(100000000.f);
