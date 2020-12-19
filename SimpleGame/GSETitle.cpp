@@ -41,6 +41,10 @@ GSETitle::~GSETitle()
 {
 	getSound()->StopBGSound(m_RainSound);
 	getSound()->DeleteBGSound(m_RainSound);
+
+	getRenderer()->DeleteTexture(m_TitleGrassTexture);
+	getRenderer()->DeleteTexture(m_TitleLogoTexture);
+	getRenderer()->DeleteTexture(m_TitlePressKeyTexture);
 }
 
 void GSETitle::Update(float elapsedTimeInSec, GSEInputs* inputs)

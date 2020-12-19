@@ -17,18 +17,20 @@ public:
 		float accX, float accY,
 		float mass);
 	void DeleteObject(int index);
-	//void Update(float elapsedTimeInSec, GSEInputs* inputs);
+
+	virtual void Update(float elapsedTimeInSec, GSEInputs* inputs) = 0;
+	virtual void RenderScene() = 0;
 
 	Renderer* getRenderer();
 	Sound* getSound();
 	GSEObject* getObject(int index);
 
-private:
 	bool AABBCollision(GSEObject* a, GSEObject* b);
 	bool ProcessCollision(GSEObject* a, GSEObject* b);
 	void AdjustPosition(GSEObject* a, GSEObject* b);
 	void DoGarbageCollect();
 
+private:
 	Renderer* m_renderer = NULL;
 	Sound* m_Sound = NULL;
 	GSEObject* m_Objects[GSE_MAX_OBJECTS];

@@ -12,11 +12,11 @@ but WITHOUT ANY WARRANTY.
 #include <iostream>
 #include "Dependencies\glew.h"
 #include "Dependencies\freeglut.h"
-#include "GSEGame.h"
 #include "GSETitle.h"
+#include "GSEBattle.h"
 
-GSEGame* g_game = NULL;
-GSETitle* g_title = NULL;
+GSETitle* g_title = NULL; 
+GSEBattle* g_battle = NULL;
 GSEInputs g_inputs;
 
 int g_GameState = TITLE_STATE;
@@ -42,13 +42,20 @@ void RenderScene(int temp)
 			g_title->RenderScene();
 
 			if (g_title->IsNextState()) {
-				g_GameState = GAMING_STATE;
+				g_GameState = BATTLE_STATE;
 				delete g_title;
+				g_battle = new GSEBattle();
 			}
 		}
-		else if (g_GameState == GAMING_STATE) {
-			//g_game->Update(elapsedTimeInSec, &tempInputs);
-			//g_game->RenderScene();
+		else if (g_GameState == BATTLE_STATE) {
+			g_battle->Update(elapsedTimeInSec, &tempInputs);
+			g_battle->RenderScene();
+
+			if (g_battle->IsNextState()) {
+				g_GameState = ENDING_STATE;
+				delete g_battle;
+				//g_ending = new GSEEnding();
+			}
 		}
 		else if (g_GameState == ENDING_STATE) {
 

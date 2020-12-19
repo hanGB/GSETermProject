@@ -155,6 +155,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="GSEBattle.h" />
     <ClInclude Include="GSEGame.h" />
     <ClInclude Include="GSEGlobals.h" />
     <ClInclude Include="GSEObject.h" />
@@ -166,6 +167,7 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="GSEBattle.cpp" />
     <ClCompile Include="GSEGame.cpp" />
     <ClCompile Include="GSEObject.cpp" />
     <ClCompile Include="GSETitle.cpp" />

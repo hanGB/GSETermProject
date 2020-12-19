@@ -9,7 +9,7 @@
 #define GSE_WINDOWSIZE_Y 720
 
 #define TITLE_STATE 0
-#define GAMING_STATE 1
+#define BATTLE_STATE 1
 #define ENDING_STATE 2
 
 typedef struct GSEInputs
