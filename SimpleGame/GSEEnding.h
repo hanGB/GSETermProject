@@ -7,10 +7,15 @@ class GSEEnding : public GSEGame{
 	int m_KZTexture ;
 	int m_MSTexture;
 	int m_MusicTexture;
+	int m_SignTexture;
+	int m_KPUTexture;
+	int m_tyfpTexture;
+	int m_finTexture;
 
 	int m_BackgroundSound;
 
 	int cameraY;
+	float m_time;
 
 public:
 		GSEEnding();

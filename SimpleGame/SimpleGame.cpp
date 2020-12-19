@@ -57,7 +57,7 @@ void RenderScene(int temp)
 			*/
 			/*
 			g_GameState = ENDING_STATE;
-			delete g_battle;
+			delete g_title;
 			g_ending = new GSEEnding();
 			*/
 			//
