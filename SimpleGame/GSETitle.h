@@ -3,7 +3,8 @@
 
 class GSETitle : public GSEGame {
 	float m_time;
-	float m_grassAnimation;
+	float m_grassAnimationTime;
+	int m_grassAnimationFrame;
 
 	int m_TitleGrassTexture;
 	int m_TitleLogoTexture;
@@ -11,6 +12,8 @@ class GSETitle : public GSEGame {
 
 	int m_grassID;
 	int m_pressKeyID;
+	
+	int m_CameraY;
 
 public:
 	GSETitle();
