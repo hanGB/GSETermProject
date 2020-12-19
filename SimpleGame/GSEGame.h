@@ -10,14 +10,18 @@ public:
 	GSEGame();
 	~GSEGame();
 
-	void RenderScene();
+	//void RenderScene();
 	int AddObject(float x, float y, float depth,
 		float sx, float sy,
 		float velX, float velY,
 		float accX, float accY,
 		float mass);
 	void DeleteObject(int index);
-	void Update(float elapsedTimeInSec, GSEInputs* inputs);
+	//void Update(float elapsedTimeInSec, GSEInputs* inputs);
+
+	Renderer* getRenderer();
+	Sound* getSound();
+	GSEObject* getObject(int index);
 
 private:
 	bool AABBCollision(GSEObject* a, GSEObject* b);
@@ -28,17 +32,5 @@ private:
 	Renderer* m_renderer = NULL;
 	Sound* m_Sound = NULL;
 	GSEObject* m_Objects[GSE_MAX_OBJECTS];
-	int m_HeroID = -1;
-
-	int m_HeroTexture = -1;
-	int m_BrickTexture = -1;
-	int m_SpriteTexture = -1;
-	int m_BGTexture = -1;
-
-	int m_BGSound = -1;
-	int m_SwordSound = -1;
-
-	int m_snowParticle = -1;
-	int m_snowTexture = -1;
 };
 

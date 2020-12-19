@@ -12,53 +12,16 @@ GSEGame::GSEGame()
 	{
 		m_Objects[i] = NULL;
 	}
-
-	m_HeroTexture = m_renderer->GenPngTexture("a.png"); //재사용 가능!!
-	m_BrickTexture = m_renderer->GenPngTexture("brick.png"); //재사용 가능!!
-	m_SpriteTexture = m_renderer->GenPngTexture("spriteSheet.png"); //재사용 가능!!
-	m_BGTexture = m_renderer->GenPngTexture("background.png");
-
-	m_snowTexture = m_renderer->GenPngTexture("particle.png");
-
-	m_snowParticle = m_renderer->CreateParticleObject(10000,
-		-640, -360, 640, 360,
-		10, 10, 10, 10,
-		-10, -10, -5, -5);
-
-	//Create Hero
-	m_HeroID = AddObject(0, 0, 0, 1, 1, 0, 0, 0, 0, 20);
-	m_Objects[m_HeroID]->SetType(GSEObjectType::TYPE_HERO); 
-	m_Objects[m_HeroID]->SetApplyPhysics(true);
-	m_Objects[m_HeroID]->SetLife(100000000.f);
-	m_Objects[m_HeroID]->SetLifeTime(100000000.f);
-	m_Objects[m_HeroID]->SetTextureID(m_SpriteTexture);
-
-	int floor = AddObject(-1.25, -2.5, 0, 2, 0.3, 0, 0, 0, 0, 10000);
-	m_Objects[floor]->SetType(GSEObjectType::TYPE_FIXED);
-	m_Objects[floor]->SetApplyPhysics(true);
-	m_Objects[floor]->SetLife(100000000.f);
-	m_Objects[floor]->SetLifeTime(100000000.f);
-	m_Objects[floor]->SetTextureID(m_BrickTexture);
-
-	floor = AddObject(+1.25, 0, 0, 1, 0.3, 0, 0, 0, 0, 10000);
-	m_Objects[floor]->SetType(GSEObjectType::TYPE_FIXED);
-	m_Objects[floor]->SetApplyPhysics(true);
-	m_Objects[floor]->SetLife(100000000.f);
-	m_Objects[floor]->SetLifeTime(100000000.f);
-	m_Objects[floor]->SetTextureID(m_BrickTexture);
-
-	m_BGSound = m_Sound->CreateBGSound("bgSound.mp3");
-	m_Sound->PlayBGSound(m_BGSound, true, 1.0f);
-
-	m_SwordSound = m_Sound->CreateShortSound("swordSound.wav");
-	
 }
 
 GSEGame::~GSEGame()
 {
 	//Renderer delete
+	delete m_renderer;
+	delete m_Sound;
 }
 
+/*
 void GSEGame::Update(float elapsedTimeInSec, GSEInputs* inputs)
 {
 	//do garbage collecting
@@ -108,19 +71,6 @@ void GSEGame::Update(float elapsedTimeInSec, GSEInputs* inputs)
 
 		m_Objects[m_HeroID]->GetPosition(&aX, &aY, &temp);
 		m_Objects[m_HeroID]->GetSize(&asX, &asY);
-
-		if (m_Objects[m_HeroID]->GetRemainingCoolTime() < 0.f)
-		{
-			int swordID = AddObject(0.f, 0.f, 0.f, 1.f, 1.f, 0.f, 0.f, 0.f, 0.f, 1.f);
-			m_Objects[swordID]->SetParentID(m_HeroID);
-			m_Objects[swordID]->SetRelPosition(norDirX, norDirY, 0.f);
-			m_Objects[swordID]->SetStickToParent(true);
-			m_Objects[swordID]->SetLife(100.f);
-			m_Objects[swordID]->SetLifeTime(0.3f); //0.3 초 후 자동 삭제.
-			m_Objects[m_HeroID]->ResetRemainingCoolTime();
-
-			m_Sound->PlayShortSound(m_SwordSound, false, 1.f);
-		}
 	}
 
 	//Processing collision
@@ -185,6 +135,22 @@ void GSEGame::Update(float elapsedTimeInSec, GSEInputs* inputs)
 	float x, y, z;
 	m_Objects[m_HeroID]->GetPosition(&x, &y, &z);
 	m_renderer->SetCameraPos(x * 100.f, y * 100.f);
+}
+*/
+
+Renderer* GSEGame::getRenderer()
+{
+	return m_renderer;
+}
+
+Sound* GSEGame::getSound()
+{
+	return m_Sound;
+}
+
+GSEObject* GSEGame::getObject(int index)
+{
+	return m_Objects[index];
 }
 
 bool GSEGame::ProcessCollision(GSEObject* a, GSEObject* b)
@@ -355,8 +321,8 @@ void GSEGame::DoGarbageCollect()
 }
 
 int temp = 0;
-float tempTime = 0.0f;
 
+/*
 void GSEGame::RenderScene()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -401,11 +367,6 @@ void GSEGame::RenderScene()
 			}
 			else
 			{
-				/*m_renderer->DrawTextureRect(
-					x, y, depth,
-					sx, sy, 1.f,
-					1.f, 1.f, 1.f, 1.f,
-					textureID);*/
 				m_renderer->DrawTextureRectAnim(
 					x, y, depth,
 					sx, sy, 1.f,
@@ -421,14 +382,8 @@ void GSEGame::RenderScene()
 
 		}
 	}
-
-	m_renderer->DrawParticle(m_snowParticle, 0, 0, 0, 
-		1.f, 
-		1, 1, 1, 1,
-		0, 0, m_snowTexture, 1.f, tempTime, 0);
-
-	tempTime += 0.016;
 }
+*/
 
 int GSEGame::AddObject(float x, float y, float depth, 
 	float sx, float sy,

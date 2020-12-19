@@ -13,9 +13,14 @@ but WITHOUT ANY WARRANTY.
 #include "Dependencies\glew.h"
 #include "Dependencies\freeglut.h"
 #include "GSEGame.h"
+#include "GSETitle.h"
 
 GSEGame* g_game = NULL;
+GSETitle* g_title = NULL;
 GSEInputs g_inputs;
+
+int g_GameState = TITLE_STATE;
+ 
 bool g_focused = true;
 
 int g_prevTimeInMillisecond = 0;
@@ -32,8 +37,17 @@ void RenderScene(int temp)
 
 	if (g_focused)
 	{
-		g_game->Update(elapsedTimeInSec, &tempInputs);
-		g_game->RenderScene();
+		if (g_GameState == TITLE_STATE) {
+			g_title->Update(elapsedTimeInSec, &tempInputs);
+			g_title->RenderScene();
+		}
+		else if (g_GameState == GAMING_STATE) {
+			//g_game->Update(elapsedTimeInSec, &tempInputs);
+			//g_game->RenderScene();
+		}
+		else if (g_GameState == ENDING_STATE) {
+
+		}
 	}
 
 	glutSwapBuffers(); //double buffering, front->back, back->front
@@ -154,7 +168,8 @@ int main(int argc, char **argv)
 		std::cout << "GLEW 3.0 not supported\n ";
 	}
 
-	g_game = new GSEGame();
+	// g_game = new GSEGame();
+	g_title = new GSETitle();
 
 	//Init g_inputs
 	memset(&g_inputs, 0, sizeof(GSEInputs));
@@ -174,7 +189,8 @@ int main(int argc, char **argv)
 
 	glutMainLoop();
 
-	delete g_game;
+	delete g_title;
+	//delete g_game;
 
     return 0;
 }

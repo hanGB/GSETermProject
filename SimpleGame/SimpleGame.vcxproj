@@ -158,6 +158,7 @@
     <ClInclude Include="GSEGame.h" />
     <ClInclude Include="GSEGlobals.h" />
     <ClInclude Include="GSEObject.h" />
+    <ClInclude Include="GSETitle.h" />
     <ClInclude Include="LoadPng.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Sound.h" />
@@ -167,6 +168,7 @@
   <ItemGroup>
     <ClCompile Include="GSEGame.cpp" />
     <ClCompile Include="GSEObject.cpp" />
+    <ClCompile Include="GSETitle.cpp" />
     <ClCompile Include="LoadPng.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="SimpleGame.cpp" />
