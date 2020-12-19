@@ -27,6 +27,8 @@ typedef struct GSEInputs
 	bool KEY_S;
 	bool KEY_D;
 
+	bool KEY_SPACE;
+
 	bool KEY_ENTER;
 };
 

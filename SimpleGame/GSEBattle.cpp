@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "GSEBattle.h"
+#include <iostream>
 
 GSEBattle::GSEBattle()
 {
@@ -20,8 +21,7 @@ GSEBattle::GSEBattle()
 
 	m_BackGroundSound = getSound()->CreateBGSound("./resource/sound/bg/battleSound.mp3");
 	
-	// 임시 무음
-	//getSound()->PlayBGSound(m_BackGroundSound, true, 0.5f);
+	getSound()->PlayBGSound(m_BackGroundSound, true, 0.5f);
 }
 
 GSEBattle::~GSEBattle()
@@ -31,11 +31,18 @@ GSEBattle::~GSEBattle()
 
 void GSEBattle::Update(float elapsedTimeInSec, GSEInputs* inputs)
 {
+	// space를 누를 시 시간이 느리게 감
+	if (inputs->KEY_SPACE)
+		elapsedTimeInSec = elapsedTimeInSec / 2;
+
+	/* 
+	// 테스트 용 enter시 맵 전환
 	if (inputs->KEY_ENTER) {
 		m_bReadyToPlay = false;
 		m_NowMap++;
 		m_NowMap = m_NowMap %2;
 	}
+	*/
 
 	if (!m_bReadyToPlay) {
 		MakeStage(m_NowMap);
@@ -164,7 +171,40 @@ void GSEBattle::Update(float elapsedTimeInSec, GSEInputs* inputs)
 	}
 	float x, y, z;
 	getObject(m_HeroID)->GetPosition(&x, &y, &z);
-	getRenderer()->SetCameraPos(x * 100.f, y * 100.f);
+
+	std::cout << "x: " << x * 100 << " , y: " << y * 100 << std::endl;
+
+	x = x * 100.f;
+	y = y * 100.f;
+
+	if (m_NowMap == RAILROAD_MAP) {
+		if (x < -3500) m_bReadyToPlay = false;
+		if (x > 3500) m_bReadyToPlay = false;
+		if (y < -400) m_bReadyToPlay = false;
+		if (y > 400) m_bReadyToPlay = false;
+
+		if (3300 < x && x < 3330) {
+			if (138.5 < y && y < 147.5) {
+				m_bReadyToPlay = false;
+				m_NowMap++;
+			}
+		}
+	}
+	else if (m_NowMap == FIRE_MAP) {
+		if (x < -2400) m_bReadyToPlay = false;
+		if (x > 2400) m_bReadyToPlay = false;
+		if (y < -400) m_bReadyToPlay = false;
+		if (y > 400) m_bReadyToPlay = false;
+
+		if (2270 < x && x < 2300) {
+			if (-170 < y && y < -160) {
+				m_bNextState = true;
+			}
+		}
+	}
+
+	getRenderer()->SetCameraPos(x, y);
+	
 }
 
 void GSEBattle::RenderScene()
@@ -205,7 +245,7 @@ void GSEBattle::RenderScene()
 			if (textureID < 0)
 			{
 				// 충돌체 테스트 시 주석 해제
-				getRenderer()->DrawSolidRect(x, y, depth, sx, sy, 0.f, 1, 0, 1, 1);
+				// getRenderer()->DrawSolidRect(x, y, depth, sx, sy, 0.f, 1, 0, 1, 1);
 			}
 			else if (type == TYPE_FIXED) {
 				getRenderer()->DrawTextureRect(
@@ -241,7 +281,7 @@ void GSEBattle::MakeStage(int map)
 	if (map == RAILROAD_MAP) 
 	{
 		//Create Hero
-		m_HeroID = AddObject(25, 5, 0, 0.8, 1.6, 0, 0, 0, 0, 50);
+		m_HeroID = AddObject(-30, 3, 0, 0.8, 1.6, 0, 0, 0, 0, 50);
 		getObject(m_HeroID)->SetType(GSEObjectType::TYPE_HERO);
 		getObject(m_HeroID)->SetApplyPhysics(true);
 		getObject(m_HeroID)->SetLife(100000000.f);
@@ -319,7 +359,7 @@ void GSEBattle::MakeStage(int map)
 	else if (map == FIRE_MAP) 
 	{
 		//Create Hero
-		m_HeroID = AddObject(0, 0, 0, 0.8, 1.6, 0, 0, 0, 0, 50);
+		m_HeroID = AddObject(-21, 0, 0, 0.8, 1.6, 0, 0, 0, 0, 50);
 		getObject(m_HeroID)->SetType(GSEObjectType::TYPE_HERO);
 		getObject(m_HeroID)->SetApplyPhysics(true);
 		getObject(m_HeroID)->SetLife(100000000.f);

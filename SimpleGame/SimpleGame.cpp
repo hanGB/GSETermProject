@@ -48,9 +48,9 @@ void RenderScene(int temp)
 			}
 			
 			//Å×½ºÆ®
-			g_GameState = BATTLE_STATE;
+			/*g_GameState = BATTLE_STATE;
 			delete g_title;
-			g_battle = new GSEBattle();
+			g_battle = new GSEBattle();*/
 			//
 		}
 		else if (g_GameState == BATTLE_STATE) {
@@ -107,6 +107,9 @@ void KeyDownInput(unsigned char key, int x, int y)
 	case 'd' | 'D':
 		g_inputs.KEY_D = true;
 		break;
+	case ' ':
+		g_inputs.KEY_SPACE = true;
+		break;
 	case GLUT_KEY_ENTER:
 		g_inputs.KEY_ENTER = true;
 		break;
@@ -128,6 +131,9 @@ void KeyUpInput(unsigned char key, int x, int y)
 		break;
 	case 'd' | 'D':
 		g_inputs.KEY_D = false;
+		break;
+	case ' ' :
+		g_inputs.KEY_SPACE = false;
 		break;
 	case GLUT_KEY_ENTER:
 		g_inputs.KEY_ENTER = false;
