@@ -156,6 +156,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GSEBattle.h" />
+    <ClInclude Include="GSEEnding.h" />
     <ClInclude Include="GSEGame.h" />
     <ClInclude Include="GSEGlobals.h" />
     <ClInclude Include="GSEObject.h" />
@@ -168,6 +169,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GSEBattle.cpp" />
+    <ClCompile Include="GSEEnding.cpp" />
     <ClCompile Include="GSEGame.cpp" />
     <ClCompile Include="GSEObject.cpp" />
     <ClCompile Include="GSETitle.cpp" />

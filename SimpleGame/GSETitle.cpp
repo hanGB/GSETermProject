@@ -15,7 +15,7 @@ GSETitle::GSETitle()
 	m_TitleGrassTexture = getRenderer()->GenPngTexture("./resource/image/title/titleGrass.png");
 	m_TitlePressKeyTexture = getRenderer()->GenPngTexture("./resource/image/title/titlePressKey.png");
 
-	m_RainParticleTexture = getRenderer()->GenPngTexture("./resource/image/particle/rainParticle.png");
+	m_RainParticleTexture = getRenderer()->GenPngTexture("./resource/image/title/rainParticle.png");
 
 	m_RainParticle = getRenderer()->CreateParticleObject(100, -1280, -720, 1280, 720, 100, 100, 300, 300, 0, -100, 0, -100);
 

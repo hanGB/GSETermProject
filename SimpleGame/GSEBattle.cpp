@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "GSEBattle.h"
-#include <iostream>
 
 GSEBattle::GSEBattle()
 {
@@ -26,7 +25,16 @@ GSEBattle::GSEBattle()
 
 GSEBattle::~GSEBattle()
 {
+	getSound()->StopBGSound(m_BackGroundSound);
+	getSound()->DeleteBGSound(m_BackGroundSound);
+	getSound()->DeleteShortSound(m_SwordSound);
+	getSound()->DeleteShortSound(m_TriggerSound);
 
+	getRenderer()->DeleteTexture(m_HeroTexture);
+	//getRenderer()->DeleteTexture(m_SwordManTexture);
+	//getRenderer()->DeleteTexture(m_GunManTexture);
+	getRenderer()->DeleteTexture(m_RailRoadMapTexture);
+	getRenderer()->DeleteTexture(m_FireMapTexture);
 }
 
 void GSEBattle::Update(float elapsedTimeInSec, GSEInputs* inputs)
@@ -172,7 +180,8 @@ void GSEBattle::Update(float elapsedTimeInSec, GSEInputs* inputs)
 	float x, y, z;
 	getObject(m_HeroID)->GetPosition(&x, &y, &z);
 
-	std::cout << "x: " << x * 100 << " , y: " << y * 100 << std::endl;
+	// 플레이어 위치 출력
+	// std::cout << "x: " << x * 100 << " , y: " << y * 100 << std::endl;
 
 	x = x * 100.f;
 	y = y * 100.f;

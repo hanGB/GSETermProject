@@ -14,9 +14,11 @@ but WITHOUT ANY WARRANTY.
 #include "Dependencies\freeglut.h"
 #include "GSETitle.h"
 #include "GSEBattle.h"
+#include "GSEEnding.h"
 
 GSETitle* g_title = NULL; 
 GSEBattle* g_battle = NULL;
+GSEEnding* g_ending = NULL;
 GSEInputs g_inputs;
 
 int g_GameState = TITLE_STATE;
@@ -48,9 +50,16 @@ void RenderScene(int temp)
 			}
 			
 			//Å×½ºÆ®
-			/*g_GameState = BATTLE_STATE;
+			/*
+			g_GameState = BATTLE_STATE;
 			delete g_title;
-			g_battle = new GSEBattle();*/
+			g_battle = new GSEBattle();
+			*/
+			/*
+			g_GameState = ENDING_STATE;
+			delete g_battle;
+			g_ending = new GSEEnding();
+			*/
 			//
 		}
 		else if (g_GameState == BATTLE_STATE) {
@@ -60,11 +69,18 @@ void RenderScene(int temp)
 			if (g_battle->IsNextState()) {
 				g_GameState = ENDING_STATE;
 				delete g_battle;
-				//g_ending = new GSEEnding();
+				g_ending = new GSEEnding();
 			}
 		}
 		else if (g_GameState == ENDING_STATE) {
+			g_ending->Update(elapsedTimeInSec, &tempInputs);
+			g_ending->RenderScene();
 
+			if (g_ending->IsNextState()) {
+				g_GameState = TITLE_STATE;
+				delete g_ending;
+				g_title = new GSETitle();
+			}
 		}
 	}
 
