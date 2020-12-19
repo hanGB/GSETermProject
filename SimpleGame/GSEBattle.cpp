@@ -3,6 +3,8 @@
 
 GSEBattle::GSEBattle()
 {
+	m_bReadyToPlay = false;
+
 	m_bNextState = false;
 	m_NowMap = 0;
 	
@@ -15,32 +17,6 @@ GSEBattle::GSEBattle()
 
 	m_RailRoadMapTexture = getRenderer()->GenPngTexture("./resource/image/battle/mapRailLoad.png");
 	m_FireMapTexture = getRenderer()->GenPngTexture("./resource/image/battle/mapFire.png");
-
-	//Create Hero
-	m_HeroID = AddObject(0, 0, 0, 0.8, 1.6, 0, 0, 0, 0, 50);
-	getObject(m_HeroID)->SetType(GSEObjectType::TYPE_HERO);
-	getObject(m_HeroID)->SetApplyPhysics(true);
-	getObject(m_HeroID)->SetLife(100000000.f);
-	getObject(m_HeroID)->SetLifeTime(100000000.f);
-	getObject(m_HeroID)->SetTextureID(m_HeroTexture);
-
-	int floor = AddObject(-1.25, -2.5, 0, 2, 0.3, 0, 0, 0, 0, 10000);
-	getObject(floor)->SetType(GSEObjectType::TYPE_FIXED);
-	getObject(floor)->SetApplyPhysics(true);
-	getObject(floor)->SetLife(100000000.f);
-	getObject(floor)->SetLifeTime(100000000.f);
-
-	floor = AddObject(+1.25, 0, 0, 1, 0.3, 0, 0, 0, 0, 10000);
-	getObject(floor)->SetType(GSEObjectType::TYPE_FIXED);
-	getObject(floor)->SetApplyPhysics(true);
-	getObject(floor)->SetLife(100000000.f);
-	getObject(floor)->SetLifeTime(100000000.f);
-
-	floor = AddObject(0, -3.6, 0, 67, 0.3, 0, 0, 0, 0, 10000);
-	getObject(floor)->SetType(GSEObjectType::TYPE_FIXED);
-	getObject(floor)->SetApplyPhysics(true);
-	getObject(floor)->SetLife(100000000.f);
-	getObject(floor)->SetLifeTime(100000000.f);
 
 	m_BackGroundSound = getSound()->CreateBGSound("./resource/sound/bg/battleSound.mp3");
 	
@@ -55,6 +31,17 @@ GSEBattle::~GSEBattle()
 
 void GSEBattle::Update(float elapsedTimeInSec, GSEInputs* inputs)
 {
+	if (inputs->KEY_ENTER) {
+		m_bReadyToPlay = false;
+		m_NowMap++;
+		m_NowMap = m_NowMap %2;
+	}
+
+	if (!m_bReadyToPlay) {
+		MakeStage(m_NowMap);
+		m_bReadyToPlay = true;
+	}
+
 	//do garbage collecting
 	DoGarbageCollect();
 
@@ -64,7 +51,7 @@ void GSEBattle::Update(float elapsedTimeInSec, GSEInputs* inputs)
 	memset(&heroParam, 0, sizeof(GSEUpdateParams));
 
 	//calc force
-	float forceAmount = 400.f;
+	float forceAmount = 800.f;
 	if (inputs->KEY_W)
 	{
 		heroParam.forceY += 20 * forceAmount;
@@ -238,5 +225,194 @@ void GSEBattle::RenderScene()
 					0);
 			}
 		}
+	}
+}
+
+void GSEBattle::MakeStage(int map)
+{
+	for (int i = 0; i < GSE_MAX_OBJECTS; i++) {
+		if (getObject(i) != NULL) {
+			DeleteObject(i);
+		}
+	}
+
+	if (map == RAILROAD_MAP) 
+	{
+		//Create Hero
+		m_HeroID = AddObject(25, 5, 0, 0.8, 1.6, 0, 0, 0, 0, 50);
+		getObject(m_HeroID)->SetType(GSEObjectType::TYPE_HERO);
+		getObject(m_HeroID)->SetApplyPhysics(true);
+		getObject(m_HeroID)->SetLife(100000000.f);
+		getObject(m_HeroID)->SetLifeTime(100000000.f);
+		getObject(m_HeroID)->SetTextureID(m_HeroTexture);
+
+		//Create Floor
+		int floor = AddObject(0, -2.5, 0, 67, 0.5, 0, 0, 0, 0, 10000);
+		getObject(floor)->SetType(GSEObjectType::TYPE_FIXED);
+		getObject(floor)->SetApplyPhysics(true);
+		getObject(floor)->SetLife(100000000.f);
+		getObject(floor)->SetLifeTime(100000000.f);
+
+		floor = AddObject(-23.5, 0, 0, 20, 0.25, 0, 0, 0, 0, 10000);
+		getObject(floor)->SetType(GSEObjectType::TYPE_FIXED);
+		getObject(floor)->SetApplyPhysics(true);
+		getObject(floor)->SetLife(100000000.f);
+		getObject(floor)->SetLifeTime(100000000.f);
+
+		floor = AddObject(33, 0.5, 0, 1, 0.25, 0, 0, 0, 0, 10000);
+		getObject(floor)->SetType(GSEObjectType::TYPE_FIXED);
+		getObject(floor)->SetApplyPhysics(true);
+		getObject(floor)->SetLife(100000000.f);
+		getObject(floor)->SetLifeTime(100000000.f);
+
+		floor = AddObject(32, 0, 0, 1, 0.25, 0, 0, 0, 0, 10000);
+		getObject(floor)->SetType(GSEObjectType::TYPE_FIXED);
+		getObject(floor)->SetApplyPhysics(true);
+		getObject(floor)->SetLife(100000000.f);
+		getObject(floor)->SetLifeTime(100000000.f);
+
+		floor = AddObject(31, -0.5, 0, 1, 0.25, 0, 0, 0, 0, 10000);
+		getObject(floor)->SetType(GSEObjectType::TYPE_FIXED);
+		getObject(floor)->SetApplyPhysics(true);
+		getObject(floor)->SetLife(100000000.f);
+		getObject(floor)->SetLifeTime(100000000.f);
+
+		floor = AddObject(30, -1, 0, 1, 0.25, 0, 0, 0, 0, 10000);
+		getObject(floor)->SetType(GSEObjectType::TYPE_FIXED);
+		getObject(floor)->SetApplyPhysics(true);
+		getObject(floor)->SetLife(100000000.f);
+		getObject(floor)->SetLifeTime(100000000.f);
+
+		floor = AddObject(29, -1.5, 0, 1, 0.25, 0, 0, 0, 0, 10000);
+		getObject(floor)->SetType(GSEObjectType::TYPE_FIXED);
+		getObject(floor)->SetApplyPhysics(true);
+		getObject(floor)->SetLife(100000000.f);
+		getObject(floor)->SetLifeTime(100000000.f);
+
+		floor = AddObject(28, -2, 0, 1, 0.25, 0, 0, 0, 0, 10000);
+		getObject(floor)->SetType(GSEObjectType::TYPE_FIXED);
+		getObject(floor)->SetApplyPhysics(true);
+		getObject(floor)->SetLife(100000000.f);
+		getObject(floor)->SetLifeTime(100000000.f);
+
+		floor = AddObject(28.2, 0.5, 0, 3.7, 0.25, 0, 0, 0, 0, 10000);
+		getObject(floor)->SetType(GSEObjectType::TYPE_WALL);
+		getObject(floor)->SetApplyPhysics(true);
+		getObject(floor)->SetLife(100000000.f);
+		getObject(floor)->SetLifeTime(100000000.f);
+
+		//Create Wall
+		int wall = AddObject(33.5, 0, 0, 0.5, 7.2, 0, 0, 0, 0, 10000);
+		getObject(wall)->SetType(GSEObjectType::TYPE_WALL);
+		getObject(wall)->SetApplyPhysics(true);
+		getObject(wall)->SetLife(100000000.f);
+		getObject(wall)->SetLifeTime(100000000.f);
+
+		wall = AddObject(-33.5, 0, 0, 0.5, 7.2, 0, 0, 0, 0, 10000);
+		getObject(wall)->SetType(GSEObjectType::TYPE_WALL);
+		getObject(wall)->SetApplyPhysics(true);
+		getObject(wall)->SetLife(100000000.f);
+		getObject(wall)->SetLifeTime(100000000.f);
+	}
+	else if (map == FIRE_MAP) 
+	{
+		//Create Hero
+		m_HeroID = AddObject(0, 0, 0, 0.8, 1.6, 0, 0, 0, 0, 50);
+		getObject(m_HeroID)->SetType(GSEObjectType::TYPE_HERO);
+		getObject(m_HeroID)->SetApplyPhysics(true);
+		getObject(m_HeroID)->SetLife(100000000.f);
+		getObject(m_HeroID)->SetLifeTime(100000000.f);
+		getObject(m_HeroID)->SetTextureID(m_HeroTexture);
+
+		int floor = AddObject(0, -2.7, 0, 47, 0.5, 0, 0, 0, 0, 10000);
+		getObject(floor)->SetType(GSEObjectType::TYPE_FIXED);
+		getObject(floor)->SetApplyPhysics(true);
+		getObject(floor)->SetLife(100000000.f);
+		getObject(floor)->SetLifeTime(100000000.f);
+
+		floor = AddObject(2.1, -0.9, 0, 13.8, 0.25, 0, 0, 0, 0, 10000);
+		getObject(floor)->SetType(GSEObjectType::TYPE_FIXED);
+		getObject(floor)->SetApplyPhysics(true);
+		getObject(floor)->SetLife(100000000.f);
+		getObject(floor)->SetLifeTime(100000000.f);
+
+		floor = AddObject(5.9, 1.59, 0, 5.9, 0.25, 0, 0, 0, 0, 10000);
+		getObject(floor)->SetType(GSEObjectType::TYPE_FIXED);
+		getObject(floor)->SetApplyPhysics(true);
+		getObject(floor)->SetLife(100000000.f);
+		getObject(floor)->SetLifeTime(100000000.f);
+
+		floor = AddObject(-3.5, 1.59, 0, 2, 0.25, 0, 0, 0, 0, 10000);
+		getObject(floor)->SetType(GSEObjectType::TYPE_FIXED);
+		getObject(floor)->SetApplyPhysics(true);
+		getObject(floor)->SetLife(100000000.f);
+		getObject(floor)->SetLifeTime(100000000.f);
+
+		floor = AddObject(9.75, -1.3, 0, 1.55, 0.25, 0, 0, 0, 0, 10000);
+		getObject(floor)->SetType(GSEObjectType::TYPE_FIXED);
+		getObject(floor)->SetApplyPhysics(true);
+		getObject(floor)->SetLife(100000000.f);
+		getObject(floor)->SetLifeTime(100000000.f);
+
+		floor = AddObject(-3.5, 1.59, 0, 2, 0.25, 0, 0, 0, 0, 10000);
+		getObject(floor)->SetType(GSEObjectType::TYPE_FIXED);
+		getObject(floor)->SetApplyPhysics(true);
+		getObject(floor)->SetLife(100000000.f);
+		getObject(floor)->SetLifeTime(100000000.f);
+
+		floor = AddObject(-7.5, -2.3, 0, 1.5, 0.25, 0, 0, 0, 0, 10000);
+		getObject(floor)->SetType(GSEObjectType::TYPE_FIXED);
+		getObject(floor)->SetApplyPhysics(true);
+		getObject(floor)->SetLife(100000000.f);
+		getObject(floor)->SetLifeTime(100000000.f);
+
+		floor = AddObject(-6.4, -2.1, 0, 0.5, 0.25, 0, 0, 0, 0, 10000);
+		getObject(floor)->SetType(GSEObjectType::TYPE_FIXED);
+		getObject(floor)->SetApplyPhysics(true);
+		getObject(floor)->SetLife(100000000.f);
+		getObject(floor)->SetLifeTime(100000000.f);
+
+		floor = AddObject(-5.9, -1.8, 0, 0.5, 0.25, 0, 0, 0, 0, 10000);
+		getObject(floor)->SetType(GSEObjectType::TYPE_FIXED);
+		getObject(floor)->SetApplyPhysics(true);
+		getObject(floor)->SetLife(100000000.f);
+		getObject(floor)->SetLifeTime(100000000.f);
+
+		floor = AddObject(-5.4, -1.5, 0, 0.5, 0.25, 0, 0, 0, 0, 10000);
+		getObject(floor)->SetType(GSEObjectType::TYPE_FIXED);
+		getObject(floor)->SetApplyPhysics(true);
+		getObject(floor)->SetLife(100000000.f);
+		getObject(floor)->SetLifeTime(100000000.f);
+
+		floor = AddObject(-4.9, -1.2, 0, 0.5, 0.25, 0, 0, 0, 0, 10000);
+		getObject(floor)->SetType(GSEObjectType::TYPE_FIXED);
+		getObject(floor)->SetApplyPhysics(true);
+		getObject(floor)->SetLife(100000000.f);
+		getObject(floor)->SetLifeTime(100000000.f);
+
+		//Create Wall
+		int wall = AddObject(23.5, 0, 0, 0.5, 7.2, 0, 0, 0, 0, 10000);
+		getObject(wall)->SetType(GSEObjectType::TYPE_WALL);
+		getObject(wall)->SetApplyPhysics(true);
+		getObject(wall)->SetLife(100000000.f);
+		getObject(wall)->SetLifeTime(100000000.f);
+
+		wall = AddObject(-23.5, 0, 0, 0.5, 7.2, 0, 0, 0, 0, 10000);
+		getObject(wall)->SetType(GSEObjectType::TYPE_WALL);
+		getObject(wall)->SetApplyPhysics(true);
+		getObject(wall)->SetLife(100000000.f);
+		getObject(wall)->SetLifeTime(100000000.f);
+
+		wall = AddObject(8.7, -1.6, 0, 0.5, 1.6, 0, 0, 0, 0, 10000);
+		getObject(wall)->SetType(GSEObjectType::TYPE_WALL);
+		getObject(wall)->SetApplyPhysics(true);
+		getObject(wall)->SetLife(100000000.f);
+		getObject(wall)->SetLifeTime(100000000.f);
+
+		wall = AddObject(10.2, -1.9, 0, 0.5, 0.9, 0, 0, 0, 0, 10000);
+		getObject(wall)->SetType(GSEObjectType::TYPE_WALL);
+		getObject(wall)->SetApplyPhysics(true);
+		getObject(wall)->SetLife(100000000.f);
+		getObject(wall)->SetLifeTime(100000000.f);
 	}
 }

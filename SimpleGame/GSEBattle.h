@@ -21,6 +21,8 @@ class GSEBattle : public GSEGame {
 
 	int m_HeroID;
 
+	bool m_bReadyToPlay;
+
 public:
 	GSEBattle();
 	~GSEBattle();
@@ -29,4 +31,7 @@ public:
 	void RenderScene();
 
 	bool IsNextState() { return m_bNextState; }
+	
+private:
+	void MakeStage(int map);
 };

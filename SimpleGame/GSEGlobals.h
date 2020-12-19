@@ -42,6 +42,8 @@ enum GSEObjectType {
 	TYPE_FIXED,
 	TYPE_BULLET,
 	TYPE_SWORD,
+	TYPE_FIXED_UP,
+	TYPE_WALL
 };
 
 enum GSEObjectState {
