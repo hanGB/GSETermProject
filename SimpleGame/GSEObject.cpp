@@ -34,7 +34,6 @@ GSEObject::GSEObject()
 	m_bAnimation = false;
 	m_AnimationFrame = 0;
 	m_AnimationFrameTime = 0;
-	m_AnimationFrameSpeed = 0.5;
 	m_AnimationState = ANIMATION_IDLE;
 }
 
@@ -72,15 +71,23 @@ void GSEObject::GetAnimationFrame(int* AnimationFrame, float* AnimationFrameTime
 {
 	*AnimationFrame = m_AnimationFrame;
 	*AnimationFrameTime = m_AnimationFrameTime;
-	*AnimationFrameSpeed = m_AnimationFrameSpeed;
+	*AnimationFrameSpeed = m_AnimationFrameSpeed[m_AnimationState];
 }
 
-void GSEObject::SetAnimationFrame(int AnimationFrame, float AnimationFrameTime, float AnimationFrameSpeed)
+void GSEObject::SetAnimationFrame(int AnimationFrame, float AnimationFrameTime)
 {
 	m_AnimationFrame = AnimationFrame;
 	m_AnimationFrameTime = AnimationFrameTime;
-	m_AnimationFrameSpeed = AnimationFrameSpeed;
 }
+
+void GSEObject::SetAnimationFrameSpeed(float idle, float run, float attack, float die)
+{
+	m_AnimationFrameSpeed[ANIMATION_IDLE] = idle;
+	m_AnimationFrameSpeed[ANIMATION_RUN] = run;
+	m_AnimationFrameSpeed[ANIMATION_ATTACK] = attack;
+	m_AnimationFrameSpeed[ANIMATION_DIE] = die;
+}
+
 
 void GSEObject::SetAnimationFrameCnt(int idle, int run, int attack, int die)
 {
@@ -185,9 +192,6 @@ void GSEObject::Update(float elapsedTimeInSec, GSEUpdateParams* param)
 	m_PositionX = m_PositionX + m_VelX * t + 0.5f * accX * tt;
 
 	m_PositionY = m_PositionY + m_VelY * t + 0.5f * accY * tt;
-
-	if (m_Type == GSEObjectType::TYPE_HERO)
-		std::cout << "속도: " << m_VelX << ", 가속도: " << accX << std::endl;
 }
 
 void GSEObject::SetPosition(float x, float y, float depth)

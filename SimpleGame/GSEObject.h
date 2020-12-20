@@ -49,7 +49,8 @@ public:
 	void SetAnimationState(int AnimationState);
 
 	void GetAnimationFrame(int* AnimationFrame, float* AnimationFrameTime, float* AnimationFrameSpeed);
-	void SetAnimationFrame(int AnimationFrame, float AnimationFrameTime, float AnimationFrameSpeed);
+	void SetAnimationFrame(int AnimationFrame, float AnimationFrameTime);
+	void SetAnimationFrameSpeed(float idle, float run, float attack, float die);
 
 	void SetAnimationFrameCnt(int idle, int run, int attack, int die);
     int GetAnimationFrameCnt();
@@ -78,7 +79,7 @@ private:
 	bool m_bAnimation;
 	int m_AnimationFrame;
 	float m_AnimationFrameTime;
-	float m_AnimationFrameSpeed;
+	float m_AnimationFrameSpeed[4];
 	int m_AnimationState;
 	int m_AnimationFrameCnt[4];
 
