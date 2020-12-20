@@ -17,6 +17,13 @@
 
 #define PLAYER_MAXIUM_SPEED 5
 
+#define ANIMATION_IDLE 0
+#define ANIMATION_RUN 1
+#define ANIMATION_ATTACK 2
+#define ANIMATION_DIE 3
+
+#define NON_DATA -1000000
+
 typedef struct GSEInputs
 {
 	bool ARROW_UP;

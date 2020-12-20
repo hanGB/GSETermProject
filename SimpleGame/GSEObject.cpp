@@ -6,18 +6,18 @@
 
 GSEObject::GSEObject()
 {
-	m_PositionX = -1000000;
-	m_PositionY = -1000000;
-	m_RelPositionX = -1000000;
-	m_RelPositionY = -1000000;
-	m_Depth = -1000000;
-	m_SizeX = -1000000;
-	m_SizeY = -1000000;
-	m_AccX = -1000000;
-	m_AccY = -1000000;
-	m_VelX = -1000000;
-	m_VelY = -1000000;
-	m_Mass = -1000000;
+	m_PositionX = NON_DATA;
+	m_PositionY = NON_DATA;
+	m_RelPositionX = NON_DATA;
+	m_RelPositionY = NON_DATA;
+	m_Depth = NON_DATA;
+	m_SizeX = NON_DATA;
+	m_SizeY = NON_DATA;
+	m_AccX = NON_DATA;
+	m_AccY = NON_DATA;
+	m_VelX = NON_DATA;
+	m_VelY = NON_DATA;
+	m_Mass = NON_DATA;
 
 	m_Parent = -1;
 	m_LifeTime = 0.f;
@@ -30,6 +30,12 @@ GSEObject::GSEObject()
 
 	m_State = GSEObjectState::STATE_FALLING;
 	m_Type = GSEObjectType::TYPE_MOVABLE;
+
+	m_bAnimation = false;
+	m_AnimationFrame = 0;
+	m_AnimationFrameTime = 0;
+	m_AnimationFrameSpeed = 0.5;
+	m_AnimationState = ANIMATION_IDLE;
 }
 
 GSEObject::~GSEObject()
@@ -45,6 +51,63 @@ void GSEObject::SetTextureID(int id)
 int GSEObject::GetTextureID()
 {
 	return m_TextureID;
+}
+
+bool GSEObject::IsAnimation()
+{
+	return m_bAnimation;
+}
+
+int GSEObject::GetAnimationState() const
+{
+	return m_AnimationState;
+}
+
+void GSEObject::SetAnimationState(int AnimationState)
+{
+	m_AnimationState = AnimationState;
+}
+
+void GSEObject::GetAnimationFrame(int* AnimationFrame, float* AnimationFrameTime, float* AnimationFrameSpeed)
+{
+	*AnimationFrame = m_AnimationFrame;
+	*AnimationFrameTime = m_AnimationFrameTime;
+	*AnimationFrameSpeed = m_AnimationFrameSpeed;
+}
+
+void GSEObject::SetAnimationFrame(int AnimationFrame, float AnimationFrameTime, float AnimationFrameSpeed)
+{
+	m_AnimationFrame = AnimationFrame;
+	m_AnimationFrameTime = AnimationFrameTime;
+	m_AnimationFrameSpeed = AnimationFrameSpeed;
+}
+
+void GSEObject::SetAnimationFrameCnt(int idle, int run, int attack, int die)
+{
+	m_bAnimation = true;
+
+	m_AnimationFrameCnt[ANIMATION_IDLE] = idle;
+	m_AnimationFrameCnt[ANIMATION_RUN] = run;
+	m_AnimationFrameCnt[ANIMATION_ATTACK] = attack;
+	m_AnimationFrameCnt[ANIMATION_DIE] = die;
+}
+
+int GSEObject::GetAnimationFrameCnt()
+{
+	return m_AnimationFrameCnt[m_AnimationState];
+}
+
+void GSEObject::SetAnimationTextureID(int idle, int run, int attack, int die)
+{
+	m_AnimationTextureID[ANIMATION_IDLE] = idle;
+	m_AnimationTextureID[ANIMATION_RUN] = run;
+	m_AnimationTextureID[ANIMATION_ATTACK] = attack;
+	m_AnimationTextureID[ANIMATION_DIE] = die;
+}
+
+int GSEObject::GetAnimationTextureID()
+{
+	return m_AnimationTextureID[m_AnimationState];
 }
 
 void GSEObject::Update(float elapsedTimeInSec, GSEUpdateParams* param)

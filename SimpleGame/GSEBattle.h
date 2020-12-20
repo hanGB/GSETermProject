@@ -7,7 +7,8 @@ class GSEBattle : public GSEGame {
 
 	int m_NowMap;
 
-	int m_HeroTexture;
+	int m_HeroIdleTexture;
+
 	int m_SwordManTexture;
 	int m_GunManTexture;
 

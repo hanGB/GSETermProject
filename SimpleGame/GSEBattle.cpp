@@ -8,16 +8,21 @@ GSEBattle::GSEBattle()
 	m_bNextState = false;
 	m_NowMap = 0;
 	
-	m_SwordSound = getSound()->CreateShortSound("./resource/sound/short/swordSound.wav");
-	m_TriggerSound = getSound()->CreateShortSound("./resource/sound/short/triggerSound.wav");
+	// 히어로 텍스쳐
+	m_HeroIdleTexture = getRenderer()->GenPngTexture("./resource/image/battle/heroIdleSprite.png");
 
-	m_HeroTexture = getRenderer()->GenPngTexture("./resource/image/battle/hero.png"); //재사용 가능!!
 	m_SwordManTexture;
 	m_GunManTexture;
 
+	// 배경 텍스쳐
 	m_RailRoadMapTexture = getRenderer()->GenPngTexture("./resource/image/battle/mapRailLoad.png");
 	m_FireMapTexture = getRenderer()->GenPngTexture("./resource/image/battle/mapFire.png");
 
+	// 효과 사운드
+	m_SwordSound = getSound()->CreateShortSound("./resource/sound/short/swordSound.wav");
+	m_TriggerSound = getSound()->CreateShortSound("./resource/sound/short/triggerSound.wav");
+
+	// 배경 사운드
 	m_BackGroundSound = getSound()->CreateBGSound("./resource/sound/bg/battleSound.mp3");
 	
 	// 임시 무음
@@ -31,7 +36,7 @@ GSEBattle::~GSEBattle()
 	getSound()->DeleteShortSound(m_SwordSound);
 	getSound()->DeleteShortSound(m_TriggerSound);
 
-	getRenderer()->DeleteTexture(m_HeroTexture);
+	getRenderer()->DeleteTexture(m_HeroIdleTexture);
 	//getRenderer()->DeleteTexture(m_SwordManTexture);
 	//getRenderer()->DeleteTexture(m_GunManTexture);
 	getRenderer()->DeleteTexture(m_RailRoadMapTexture);
@@ -51,7 +56,6 @@ void GSEBattle::Update(float elapsedTimeInSec, GSEInputs* inputs)
 		m_NowMap++;
 		m_NowMap = m_NowMap %2;
 	}
-	
 
 	if (!m_bReadyToPlay) {
 		MakeStage(m_NowMap);
@@ -163,6 +167,21 @@ void GSEBattle::Update(float elapsedTimeInSec, GSEInputs* inputs)
 	{
 		if (getObject(i) != NULL)
 		{
+			// Animation Frame Change
+			if (getObject(i)->IsAnimation()) 
+			{
+				int frame;
+				float frameTime;
+				float frameSpeed;
+
+				getObject(i)->GetAnimationFrame(&frame, &frameTime, &frameSpeed);
+
+				frameTime = frameTime + frameSpeed * getObject(i)->GetAnimationFrameCnt() * elapsedTimeInSec;
+				frame = (int)frameTime % getObject(i)->GetAnimationFrameCnt();
+
+				getObject(i)->SetAnimationFrame(frame, frameTime, frameSpeed);
+			}
+
 			if (i == m_HeroID)
 			{
 				getObject(i)->Update(elapsedTimeInSec, &heroParam);
@@ -199,8 +218,8 @@ void GSEBattle::Update(float elapsedTimeInSec, GSEInputs* inputs)
 	if (m_NowMap == RAILROAD_MAP) {
 		if (x < -3500) m_bReadyToPlay = false;
 		if (x > 3500) m_bReadyToPlay = false;
-		if (y < -500) m_bReadyToPlay = false;
-		if (y > 500) m_bReadyToPlay = false;
+		if (y < -600) m_bReadyToPlay = false;
+		if (y > 600) m_bReadyToPlay = false;
 
 		if (3300 < x && x < 3330) {
 			if (138.5 < y && y < 147.5) {
@@ -261,12 +280,7 @@ void GSEBattle::RenderScene()
 			GSEObjectType type;
 			getObject(i)->GetType(&type);
 
-			if (textureID < 0)
-			{
-				// 충돌체 테스트 시 주석 해제
-				getRenderer()->DrawSolidRect(x, y, depth, sx, sy, 0.f, 1, 0, 1, 1);
-			}
-			else if (type == TYPE_FIXED) {
+			if (type == TYPE_FIXED) {
 				getRenderer()->DrawTextureRect(
 					x, y, depth,
 					sx, sy, 1.f,
@@ -275,15 +289,27 @@ void GSEBattle::RenderScene()
 			}
 			else
 			{
-				getRenderer()->DrawTextureRectAnim(
-					x, y, depth,
-					sx, sy, 1.f,
-					1.f, 1.f, 1.f, 1.f,
-					textureID,
-					28,
-					12,
-					5,
-					0);
+				if (getObject(i)->IsAnimation()) {
+					int frame;
+					float frametime;
+					float framespeed;
+					getObject(i)->GetAnimationFrame(&frame, &frametime, &framespeed);
+					getRenderer()->DrawTextureRectAnim(
+						x, y, depth,
+						sx, sy, 1.f,
+						1.f, 1.f, 1.f, 1.f,
+						getObject(i)->GetAnimationTextureID(),
+						getObject(i)->GetAnimationFrameCnt(), 1, 
+						frame, 0);
+				}
+				else {
+					getRenderer()->DrawTextureRect(
+						x, y, depth,
+						sx, sy, 1.f,
+						1.f, 1.f, 1.f, 1.f,
+						textureID
+					);
+				}
 			}
 		}
 	}
@@ -305,7 +331,9 @@ void GSEBattle::MakeStage(int map)
 		getObject(m_HeroID)->SetApplyPhysics(true);
 		getObject(m_HeroID)->SetLife(100000000.f);
 		getObject(m_HeroID)->SetLifeTime(100000000.f);
-		getObject(m_HeroID)->SetTextureID(m_HeroTexture);
+		getObject(m_HeroID)->SetAnimationTextureID(m_HeroIdleTexture, -1, -1, -1);
+		getObject(m_HeroID)->SetAnimationFrameCnt(14, -1, -1, -1);
+		getObject(m_HeroID)->SetAnimationFrame(0, 0, 0.5);
 
 		//Create Floor
 		int floor = AddObject(0, -2.5, 0, 67, 0.5, 0, 0, 0, 0, 10000);
@@ -356,12 +384,6 @@ void GSEBattle::MakeStage(int map)
 		getObject(floor)->SetLife(100000000.f);
 		getObject(floor)->SetLifeTime(100000000.f);
 
-		/*floor = AddObject(28.2, 0.5, 0, 3.7, 0.25, 0, 0, 0, 0, 10000);
-		getObject(floor)->SetType(GSEObjectType::TYPE_FIXED_UP);
-		getObject(floor)->SetApplyPhysics(true);
-		getObject(floor)->SetLife(100000000.f);
-		getObject(floor)->SetLifeTime(100000000.f)*/;
-
 		//Create Wall
 		int wall = AddObject(33.8, 0, 0, 0.5, 7.2, 0, 0, 0, 0, 10000);
 		getObject(wall)->SetType(GSEObjectType::TYPE_WALL);
@@ -383,7 +405,8 @@ void GSEBattle::MakeStage(int map)
 		getObject(m_HeroID)->SetApplyPhysics(true);
 		getObject(m_HeroID)->SetLife(100000000.f);
 		getObject(m_HeroID)->SetLifeTime(100000000.f);
-		getObject(m_HeroID)->SetTextureID(m_HeroTexture);
+		getObject(m_HeroID)->SetAnimationTextureID(m_HeroIdleTexture, -1, -1, -1);
+		getObject(m_HeroID)->SetAnimationFrameCnt(14, -1, -1, -1);
 
 		int floor = AddObject(0, -2.7, 0, 47, 0.5, 0, 0, 0, 0, 10000);
 		getObject(floor)->SetType(GSEObjectType::TYPE_FIXED);

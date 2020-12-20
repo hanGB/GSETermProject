@@ -43,6 +43,20 @@ public:
 	void SetTextureID(int id);
 	int GetTextureID();
 
+	bool IsAnimation();
+
+	int GetAnimationState() const;
+	void SetAnimationState(int AnimationState);
+
+	void GetAnimationFrame(int* AnimationFrame, float* AnimationFrameTime, float* AnimationFrameSpeed);
+	void SetAnimationFrame(int AnimationFrame, float AnimationFrameTime, float AnimationFrameSpeed);
+
+	void SetAnimationFrameCnt(int idle, int run, int attack, int die);
+    int GetAnimationFrameCnt();
+
+	void SetAnimationTextureID(int idle, int run, int attack, int die);
+	int GetAnimationTextureID();
+
 private:
 	float m_PositionX, m_PositionY;
 	float m_RelPositionX, m_RelPositionY;
@@ -60,6 +74,15 @@ private:
 	float m_RemainingCoolTime;
 	bool m_StickToParent;
 	int m_TextureID;
+
+	bool m_bAnimation;
+	int m_AnimationFrame;
+	float m_AnimationFrameTime;
+	float m_AnimationFrameSpeed;
+	int m_AnimationState;
+	int m_AnimationFrameCnt[4];
+
+	int m_AnimationTextureID[4];
 
 	GSEObjectState m_State;
 	GSEObjectType m_Type;
