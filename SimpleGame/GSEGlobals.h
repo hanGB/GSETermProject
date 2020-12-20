@@ -15,6 +15,8 @@
 #define RAILROAD_MAP 0
 #define FIRE_MAP 1
 
+#define PLAYER_MAXIUM_SPEED 5
+
 typedef struct GSEInputs
 {
 	bool ARROW_UP;

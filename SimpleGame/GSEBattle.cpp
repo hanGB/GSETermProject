@@ -20,7 +20,8 @@ GSEBattle::GSEBattle()
 
 	m_BackGroundSound = getSound()->CreateBGSound("./resource/sound/bg/battleSound.mp3");
 	
-	getSound()->PlayBGSound(m_BackGroundSound, true, 0.5f);
+	// 임시 무음
+	//getSound()->PlayBGSound(m_BackGroundSound, true, 0.5f);
 }
 
 GSEBattle::~GSEBattle()
@@ -43,14 +44,14 @@ void GSEBattle::Update(float elapsedTimeInSec, GSEInputs* inputs)
 	if (inputs->KEY_SPACE)
 		elapsedTimeInSec = elapsedTimeInSec / 2;
 
-	/* 
+	
 	// 테스트 용 enter시 맵 전환
 	if (inputs->KEY_ENTER) {
 		m_bReadyToPlay = false;
 		m_NowMap++;
 		m_NowMap = m_NowMap %2;
 	}
-	*/
+	
 
 	if (!m_bReadyToPlay) {
 		MakeStage(m_NowMap);
@@ -67,22 +68,30 @@ void GSEBattle::Update(float elapsedTimeInSec, GSEInputs* inputs)
 
 	//calc force
 	float forceAmountX = 800.f;
-	float forceAmountY = 600.f;
+	float forceAmountY = 225.f;
+
 	if (inputs->KEY_W)
 	{
-		heroParam.forceY += 20 * forceAmountY;
+		heroParam.forceY += 50 * forceAmountY;
+		
 	}
 	if (inputs->KEY_A)
 	{
-		heroParam.forceX -= forceAmountX;
+		float vx, vy;
+		getObject(m_HeroID)->GetVel(&vx, &vy);
+		if (vx > -PLAYER_MAXIUM_SPEED)
+			heroParam.forceX -= forceAmountX;
 	}
 	if (inputs->KEY_S)
 	{
-		heroParam.forceY -= forceAmountX;
+		heroParam.forceY -= forceAmountY;
 	}
 	if (inputs->KEY_D)
 	{
-		heroParam.forceX += forceAmountY;
+		float vx, vy;
+		getObject(m_HeroID)->GetVel(&vx, &vy);
+		if (vx < PLAYER_MAXIUM_SPEED)
+			heroParam.forceX += forceAmountX;
 	}
 
 	//sword
@@ -177,11 +186,12 @@ void GSEBattle::Update(float elapsedTimeInSec, GSEInputs* inputs)
 			}
 		}
 	}
+
 	float x, y, z;
 	getObject(m_HeroID)->GetPosition(&x, &y, &z);
 
 	// 플레이어 위치 출력
-	// std::cout << "x: " << x * 100 << " , y: " << y * 100 << std::endl;
+	std::cout << "x: " << x * 100 << " , y: " << y * 100 << std::endl;
 
 	x = x * 100.f;
 	y = y * 100.f;
@@ -189,8 +199,8 @@ void GSEBattle::Update(float elapsedTimeInSec, GSEInputs* inputs)
 	if (m_NowMap == RAILROAD_MAP) {
 		if (x < -3500) m_bReadyToPlay = false;
 		if (x > 3500) m_bReadyToPlay = false;
-		if (y < -400) m_bReadyToPlay = false;
-		if (y > 400) m_bReadyToPlay = false;
+		if (y < -500) m_bReadyToPlay = false;
+		if (y > 500) m_bReadyToPlay = false;
 
 		if (3300 < x && x < 3330) {
 			if (138.5 < y && y < 147.5) {
@@ -202,8 +212,8 @@ void GSEBattle::Update(float elapsedTimeInSec, GSEInputs* inputs)
 	else if (m_NowMap == FIRE_MAP) {
 		if (x < -2400) m_bReadyToPlay = false;
 		if (x > 2400) m_bReadyToPlay = false;
-		if (y < -400) m_bReadyToPlay = false;
-		if (y > 400) m_bReadyToPlay = false;
+		if (y < -600) m_bReadyToPlay = false;
+		if (y > 600) m_bReadyToPlay = false;
 
 		if (2270 < x && x < 2300) {
 			if (-170 < y && y < -160) {
@@ -254,7 +264,7 @@ void GSEBattle::RenderScene()
 			if (textureID < 0)
 			{
 				// 충돌체 테스트 시 주석 해제
-				// getRenderer()->DrawSolidRect(x, y, depth, sx, sy, 0.f, 1, 0, 1, 1);
+				getRenderer()->DrawSolidRect(x, y, depth, sx, sy, 0.f, 1, 0, 1, 1);
 			}
 			else if (type == TYPE_FIXED) {
 				getRenderer()->DrawTextureRect(
@@ -290,7 +300,7 @@ void GSEBattle::MakeStage(int map)
 	if (map == RAILROAD_MAP) 
 	{
 		//Create Hero
-		m_HeroID = AddObject(-30, 3, 0, 0.8, 1.6, 0, 0, 0, 0, 50);
+		m_HeroID = AddObject(-30, 3, 0, 0.8, 1.65, 0, 0, 0, 0, 50);
 		getObject(m_HeroID)->SetType(GSEObjectType::TYPE_HERO);
 		getObject(m_HeroID)->SetApplyPhysics(true);
 		getObject(m_HeroID)->SetLife(100000000.f);
@@ -368,7 +378,7 @@ void GSEBattle::MakeStage(int map)
 	else if (map == FIRE_MAP) 
 	{
 		//Create Hero
-		m_HeroID = AddObject(-21, 0, 0, 0.8, 1.6, 0, 0, 0, 0, 50);
+		m_HeroID = AddObject(-21, 0, 0, 0.8, 1.65, 0, 0, 0, 0, 50);
 		getObject(m_HeroID)->SetType(GSEObjectType::TYPE_HERO);
 		getObject(m_HeroID)->SetApplyPhysics(true);
 		getObject(m_HeroID)->SetLife(100000000.f);

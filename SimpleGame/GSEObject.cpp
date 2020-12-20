@@ -82,6 +82,7 @@ void GSEObject::Update(float elapsedTimeInSec, GSEUpdateParams* param)
 
 		//check wrong friction direction
 		float tempVelX = m_VelX + accX * t;
+
 		if (m_VelX * tempVelX < 0.f)
 		{
 			m_VelX = 0.f;
@@ -119,7 +120,11 @@ void GSEObject::Update(float elapsedTimeInSec, GSEUpdateParams* param)
 
 	//update position
 	m_PositionX = m_PositionX + m_VelX * t + 0.5f * accX * tt;
+
 	m_PositionY = m_PositionY + m_VelY * t + 0.5f * accY * tt;
+
+	if (m_Type == GSEObjectType::TYPE_HERO)
+		std::cout << "속도: " << m_VelX << ", 가속도: " << accX << std::endl;
 }
 
 void GSEObject::SetPosition(float x, float y, float depth)
