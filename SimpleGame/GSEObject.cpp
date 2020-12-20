@@ -35,6 +35,8 @@ GSEObject::GSEObject()
 	m_AnimationFrame = 0;
 	m_AnimationFrameTime = 0;
 	m_AnimationState = ANIMATION_IDLE;
+
+	m_dir = 1;
 }
 
 GSEObject::~GSEObject()
@@ -117,6 +119,16 @@ int GSEObject::GetAnimationTextureID()
 	return m_AnimationTextureID[m_AnimationState];
 }
 
+void GSEObject::SetDir(int dir)
+{
+	m_dir = dir;
+}
+
+int GSEObject::GetDir()
+{
+	return m_dir;
+}
+
 void GSEObject::Update(float elapsedTimeInSec, GSEUpdateParams* param)
 {
 	m_RemainingCoolTime -= elapsedTimeInSec;
@@ -189,6 +201,20 @@ void GSEObject::Update(float elapsedTimeInSec, GSEUpdateParams* param)
 	m_VelY = m_VelY + accY * t;
 
 	//update position
+	if (m_VelX > 0)
+		m_dir = 1;
+	else if (m_VelX < 0)
+		m_dir = -1;
+
+	if (fabs(m_VelX) > PLAYER_MAXIUM_SPEED - 1)
+		m_AnimationFrameSpeed[ANIMATION_RUN] = 3;
+	else if (fabs(m_VelX) > PLAYER_MAXIUM_SPEED - 2.5)
+		m_AnimationFrameSpeed[ANIMATION_RUN] = 2;
+	else if (fabs(m_VelX) > PLAYER_MAXIUM_SPEED - 4)
+		m_AnimationFrameSpeed[ANIMATION_RUN] = 1;
+	else 
+		m_AnimationFrameSpeed[ANIMATION_RUN] = 0.5;
+
 	m_PositionX = m_PositionX + m_VelX * t + 0.5f * accX * tt;
 
 	m_PositionY = m_PositionY + m_VelY * t + 0.5f * accY * tt;

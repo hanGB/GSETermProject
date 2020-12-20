@@ -58,6 +58,9 @@ public:
 	void SetAnimationTextureID(int idle, int run, int attack, int die);
 	int GetAnimationTextureID();
 
+	void SetDir(int dir);
+	int GetDir();
+
 private:
 	float m_PositionX, m_PositionY;
 	float m_RelPositionX, m_RelPositionY;
@@ -84,6 +87,8 @@ private:
 	int m_AnimationFrameCnt[4];
 
 	int m_AnimationTextureID[4];
+
+	int m_dir;
 
 	GSEObjectState m_State;
 	GSEObjectType m_Type;

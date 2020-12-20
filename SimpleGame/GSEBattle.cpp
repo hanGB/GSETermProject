@@ -111,8 +111,14 @@ void GSEBattle::Update(float elapsedTimeInSec, GSEInputs* inputs)
 	float swordPosX = 0.f;
 	float swordPosY = 0.f;
 
-	if (inputs->ARROW_LEFT) swordPosX += -1.f;
-	if (inputs->ARROW_RIGHT) swordPosX += 1.f;
+	if (inputs->ARROW_LEFT) {
+		getObject(m_HeroID)->SetDir(-1);
+		swordPosX += -1.f;
+	}
+	if (inputs->ARROW_RIGHT) {
+		getObject(m_HeroID)->SetDir(+1);
+		swordPosX += 1.f;
+	}
 	if (inputs->ARROW_DOWN) swordPosY += -1.f;
 	if (inputs->ARROW_UP) swordPosY += 1.f;
 	float swordDirSize = sqrtf(swordPosX * swordPosX + swordPosY * swordPosY);
@@ -183,16 +189,16 @@ void GSEBattle::Update(float elapsedTimeInSec, GSEInputs* inputs)
 		if (getObject(i) != NULL)
 		{
 			// Animation Frame Change
-			if (getObject(i)->IsAnimation()) 
+			if (getObject(i)->IsAnimation())
 			{
 
 
-				int state;
+				int aniState;
 				float vx, vy;
 
 				getObject(i)->GetVel(&vx, &vy);
 
-				state = getObject(i)->GetAnimationState();
+				aniState = getObject(i)->GetAnimationState();
 
 				int frame;
 				float frameTime;
@@ -200,35 +206,35 @@ void GSEBattle::Update(float elapsedTimeInSec, GSEInputs* inputs)
 
 				getObject(i)->GetAnimationFrame(&frame, &frameTime, &frameSpeed);
 
-				if (state == ANIMATION_IDLE || state == ANIMATION_ATTACK)
+				if (aniState == ANIMATION_IDLE || aniState == ANIMATION_ATTACK)
 					if (vx != 0.f || vy != 0.f) {
-						if (state == ANIMATION_ATTACK) {
+						if (aniState == ANIMATION_ATTACK) {
 							if (frame + 1 >= getObject(i)->GetAnimationFrameCnt()) {
 								getObject(i)->SetAnimationFrame(0, 0.f);
-								state = ANIMATION_RUN;
+								aniState = ANIMATION_RUN;
 							}
 						}
 						else {
 							getObject(i)->SetAnimationFrame(0, 0.f);
-							state = ANIMATION_RUN;
+							aniState = ANIMATION_RUN;
 						}
 					}
 
-				if (state == ANIMATION_RUN || state == ANIMATION_ATTACK)
+				if (aniState == ANIMATION_RUN || aniState == ANIMATION_ATTACK)
 					if (vx == 0.f && vy == 0.f) {
-						if (state == ANIMATION_ATTACK) {
+						if (aniState == ANIMATION_ATTACK) {
 							if (frame + 1 >= getObject(i)->GetAnimationFrameCnt()) {
 								getObject(i)->SetAnimationFrame(0, 0.f);
-								state = ANIMATION_IDLE;
+								aniState = ANIMATION_IDLE;
 							}
 						}
 						else {
 							getObject(i)->SetAnimationFrame(0, 0.f);
-							state = ANIMATION_IDLE;
+							aniState = ANIMATION_IDLE;
 						}
 					}
 
-				getObject(i)->SetAnimationState(state);
+				getObject(i)->SetAnimationState(aniState);
 
 				// 플레이어 사망시 재시작
 				if (i == m_HeroID) {
@@ -240,9 +246,19 @@ void GSEBattle::Update(float elapsedTimeInSec, GSEInputs* inputs)
 					}
 				}
 
+				GSEObjectState objectState;
+				getObject(i)->GetState(&objectState);
 				// 애니메이션 프래임 계산
-				frameTime = frameTime + frameSpeed * getObject(i)->GetAnimationFrameCnt() * elapsedTimeInSec;
-				frame = (int)frameTime % getObject(i)->GetAnimationFrameCnt();
+				if (aniState == ANIMATION_RUN) {
+					if (objectState == STATE_GROUND) {
+						frameTime = frameTime + frameSpeed * getObject(i)->GetAnimationFrameCnt() * elapsedTimeInSec;
+						frame = (int)frameTime % getObject(i)->GetAnimationFrameCnt();
+					}
+				}
+				else {
+					frameTime = frameTime + frameSpeed * getObject(i)->GetAnimationFrameCnt() * elapsedTimeInSec;
+					frame = (int)frameTime % getObject(i)->GetAnimationFrameCnt();
+				}
 
 				getObject(i)->SetAnimationFrame(frame, frameTime);
 			}
@@ -358,7 +374,7 @@ void GSEBattle::RenderScene()
 					getObject(i)->GetAnimationFrame(&frame, &frametime, &framespeed);
 					getRenderer()->DrawTextureRectAnim(
 						x, y, depth,
-						sx, sy, 1.f,
+						getObject(i)->GetDir() * sx, sy, 1.f,
 						1.f, 1.f, 1.f, 1.f,
 						getObject(i)->GetAnimationTextureID(),
 						getObject(i)->GetAnimationFrameCnt(), 1,
@@ -367,7 +383,7 @@ void GSEBattle::RenderScene()
 				else {
 					getRenderer()->DrawTextureRect(
 						x, y, depth,
-						sx, sy, 1.f,
+						getObject(i)->GetDir() * sx, -sy, 1.f,
 						1.f, 1.f, 1.f, 1.f,
 						textureID
 					);
@@ -391,9 +407,10 @@ void GSEBattle::MakeStage(int map)
 		m_HeroID = AddObject(-30, 3, 0, 0.8, 1.65, 0, 0, 0, 0, 50);
 		getObject(m_HeroID)->SetType(GSEObjectType::TYPE_HERO);
 		getObject(m_HeroID)->SetApplyPhysics(true);
-		getObject(m_HeroID)->SetLife(100000000.f);
+		getObject(m_HeroID)->SetLife(100.f);
 		getObject(m_HeroID)->SetLifeTime(100000000.f);
-		getObject(m_HeroID)->SetAnimationTextureID(m_HeroIdleTexture, m_HeroRunTexture, m_HeroAttackTexture, m_HeroDieTexture);
+		getObject(m_HeroID)->SetAnimationTextureID(
+			m_HeroIdleTexture, m_HeroRunTexture, m_HeroAttackTexture, m_HeroDieTexture);
 		getObject(m_HeroID)->SetAnimationFrameCnt(14, 8, 13, 5);
 		getObject(m_HeroID)->SetAnimationFrame(0, 0); 
 		getObject(m_HeroID)->SetAnimationFrameSpeed(0.5, 3, 1, 1);
@@ -466,10 +483,13 @@ void GSEBattle::MakeStage(int map)
 		m_HeroID = AddObject(-21, 0, 0, 0.8, 1.65, 0, 0, 0, 0, 50);
 		getObject(m_HeroID)->SetType(GSEObjectType::TYPE_HERO);
 		getObject(m_HeroID)->SetApplyPhysics(true);
-		getObject(m_HeroID)->SetLife(100000000.f);
+		getObject(m_HeroID)->SetLife(100.f);
 		getObject(m_HeroID)->SetLifeTime(100000000.f);
-		getObject(m_HeroID)->SetAnimationTextureID(m_HeroIdleTexture, -1, -1, -1);
-		getObject(m_HeroID)->SetAnimationFrameCnt(14, -1, -1, -1);
+		getObject(m_HeroID)->SetAnimationTextureID(
+			m_HeroIdleTexture, m_HeroRunTexture, m_HeroAttackTexture, m_HeroDieTexture);
+		getObject(m_HeroID)->SetAnimationFrameCnt(14, 8, 13, 5);
+		getObject(m_HeroID)->SetAnimationFrame(0, 0);
+		getObject(m_HeroID)->SetAnimationFrameSpeed(0.5, 3, 1, 1);
 
 		int floor = AddObject(0, -2.7, 0, 47, 0.5, 0, 0, 0, 0, 10000);
 		getObject(floor)->SetType(GSEObjectType::TYPE_FIXED);
