@@ -58,6 +58,9 @@ public:
 	void SetAnimationTextureID(int idle, int run, int attack, int die);
 	int GetAnimationTextureID();
 
+	void SetEnemyType(int type);
+	int GetEnemyType() const;
+
 	void SetDir(int dir);
 	int GetDir();
 
@@ -89,6 +92,8 @@ private:
 	int m_AnimationTextureID[4];
 
 	int m_dir;
+
+	int m_enemyType;
 
 	GSEObjectState m_State;
 	GSEObjectType m_Type;

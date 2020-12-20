@@ -42,6 +42,10 @@ bool GSEGame::ProcessCollision(GSEObject* a, GSEObject* b)
 	a->GetType(&aType);
 	b->GetType(&bType);
 
+	if (((aType == GSEObjectType::TYPE_HERO || aType == GSEObjectType::TYPE_ENEMY) &&
+		(bType == GSEObjectType::TYPE_HERO || bType == GSEObjectType::TYPE_ENEMY)))
+		return false;
+
 	bool isCollide = AABBCollision(a, b);
 	if (isCollide)
 	{
@@ -50,6 +54,48 @@ bool GSEGame::ProcessCollision(GSEObject* a, GSEObject* b)
 		{
 			a->SetState(GSEObjectState::STATE_GROUND);
 			b->SetState(GSEObjectState::STATE_GROUND);
+		}
+
+		// 무기가 히어로나 군인에 충돌 -> 맞은 대상 사망
+		else if ((aType == GSEObjectType::TYPE_SWORD || aType == GSEObjectType::TYPE_BULLET) && 
+			(bType == GSEObjectType::TYPE_HERO || bType == GSEObjectType::TYPE_ENEMY))
+		{
+			if (getObject(a->GetParentID()) != b) {
+				if (aType == GSEObjectType::TYPE_BULLET)
+					a->SetLife(0.0f);
+
+				b->SetAnimationFrame(0, 0);
+				b->SetAnimationState(ANIMATION_DIE);
+				b->SetApplyPhysics(false);
+			}
+		}
+		else if ((bType == GSEObjectType::TYPE_SWORD || bType == GSEObjectType::TYPE_BULLET) &&
+			(aType == GSEObjectType::TYPE_HERO || aType == GSEObjectType::TYPE_ENEMY))
+		{
+			if (getObject(b->GetParentID()) != a) {
+				if (bType == GSEObjectType::TYPE_BULLET)
+					b->SetLifeTime(0.0f);
+
+				a->SetAnimationFrame(0, 0);
+				a->SetAnimationState(ANIMATION_DIE);
+				b->SetApplyPhysics(false);
+			}
+		}
+		else if (aType == GSEObjectType::TYPE_SWORD && bType == GSEObjectType::TYPE_BULLET) {
+			GSEObjectType type;
+			m_Objects[a->GetParentID()]->GetType(&type);
+
+			if (type == TYPE_HERO) {
+				b->SetLifeTime(0.0f);
+			}
+		}
+		else if (bType == GSEObjectType::TYPE_SWORD && aType == GSEObjectType::TYPE_BULLET) {
+			GSEObjectType type;
+			m_Objects[b->GetParentID()]->GetType(&type);
+
+			if (type == TYPE_HERO) {
+				a->SetLifeTime(0.0f);
+			}
 		}
 	}
 	return isCollide;
@@ -132,9 +178,9 @@ void GSEGame::AdjustPosition(GSEObject* a, GSEObject* b)
 	bMinY = bY - bsY / 2.f;
 	bMaxY = bY + bsY / 2.f;
 
-	if ((aType == GSEObjectType::TYPE_MOVABLE || aType == GSEObjectType::TYPE_HERO)
+	if ((aType == GSEObjectType::TYPE_ENEMY || aType == GSEObjectType::TYPE_HERO)
 		&&
-		(bType == GSEObjectType::TYPE_FIXED || bType == GSEObjectType::TYPE_FIXED_UP))
+		(bType == GSEObjectType::TYPE_FIXED))
 	{
 		if (aMaxY > bMaxY)
 		{
@@ -148,21 +194,19 @@ void GSEGame::AdjustPosition(GSEObject* a, GSEObject* b)
 		}
 		else
 		{
-			if (bType != GSEObjectType::TYPE_FIXED_UP) {
-				aY = aY - (aMaxY - bMinY);
+			aY = aY - (aMaxY - bMinY);
 
-				a->SetPosition(aX, aY, 0.f);
+			a->SetPosition(aX, aY, 0.f);
 
-				float vx, vy;
-				a->GetVel(&vx, &vy);
-				a->SetVel(vx, 0.f);
-			}
+			float vx, vy;
+			a->GetVel(&vx, &vy);
+			a->SetVel(vx, 0.f);
 		}
 	}
 	else if (
-		(bType == GSEObjectType::TYPE_MOVABLE || bType == GSEObjectType::TYPE_HERO)
+		(bType == GSEObjectType::TYPE_ENEMY || bType == GSEObjectType::TYPE_HERO)
 		&&
-		(aType == GSEObjectType::TYPE_FIXED || aType == GSEObjectType::TYPE_FIXED_UP)
+		(aType == GSEObjectType::TYPE_FIXED)
 		)
 	{
 		if (!(bMaxY > aMaxY && bMinY < aMinY))
@@ -178,20 +222,19 @@ void GSEGame::AdjustPosition(GSEObject* a, GSEObject* b)
 			}
 			else
 			{
-				if (aType != GSEObjectType::TYPE_FIXED_UP) {
-					bY = bY - (bMaxY - aMinY);
+				bY = bY - (bMaxY - aMinY);
 
-					b->SetPosition(bX, bY, 0.f);
-					float vx, vy;
-					b->GetVel(&vx, &vy);
-					b->SetVel(vx, 0.f);
-				}
+				b->SetPosition(bX, bY, 0.f);
+				float vx, vy;
+				b->GetVel(&vx, &vy);
+				b->SetVel(vx, 0.f);
+
 			}
 		}
 	}
 
 	// 벽(Wall)과 충돌 처리
-	else if ((aType == GSEObjectType::TYPE_MOVABLE || aType == GSEObjectType::TYPE_HERO)
+	else if ((aType == GSEObjectType::TYPE_ENEMY || aType == GSEObjectType::TYPE_HERO)
 		&&
 		bType == GSEObjectType::TYPE_WALL)
 	{
@@ -217,7 +260,7 @@ void GSEGame::AdjustPosition(GSEObject* a, GSEObject* b)
 		}
 	}
 	else if (
-		(bType == GSEObjectType::TYPE_MOVABLE || bType == GSEObjectType::TYPE_HERO)
+		(bType == GSEObjectType::TYPE_ENEMY || bType == GSEObjectType::TYPE_HERO)
 		&&
 		(aType == GSEObjectType::TYPE_WALL)
 		)

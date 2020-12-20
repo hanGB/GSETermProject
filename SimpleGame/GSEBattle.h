@@ -43,4 +43,5 @@ public:
 	
 private:
 	void MakeStage(int map);
+	void SoldierBehave(float elapsedTimeInSec);
 };

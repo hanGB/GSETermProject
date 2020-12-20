@@ -29,7 +29,7 @@ GSEObject::GSEObject()
 	m_TextureID = -1;
 
 	m_State = GSEObjectState::STATE_FALLING;
-	m_Type = GSEObjectType::TYPE_MOVABLE;
+	m_Type = GSEObjectType::TYPE_ENEMY;
 
 	m_bAnimation = false;
 	m_AnimationFrame = 0;
@@ -119,6 +119,16 @@ int GSEObject::GetAnimationTextureID()
 	return m_AnimationTextureID[m_AnimationState];
 }
 
+void GSEObject::SetEnemyType(int type)
+{
+	m_enemyType = type;
+}
+
+int GSEObject::GetEnemyType() const
+{
+	return m_enemyType;
+}
+
 void GSEObject::SetDir(int dir)
 {
 	m_dir = dir;
@@ -134,7 +144,7 @@ void GSEObject::Update(float elapsedTimeInSec, GSEUpdateParams* param)
 	m_RemainingCoolTime -= elapsedTimeInSec;
 	m_LifeTime -= elapsedTimeInSec;
 
-	if (m_Type != GSEObjectType::TYPE_MOVABLE && m_Type != GSEObjectType::TYPE_HERO)
+	if (m_Type != GSEObjectType::TYPE_ENEMY && m_Type != GSEObjectType::TYPE_HERO && m_Type != GSEObjectType::TYPE_BULLET)
 		return;
 
 	if (!m_ApplyPhysics)
@@ -151,7 +161,8 @@ void GSEObject::Update(float elapsedTimeInSec, GSEUpdateParams* param)
 
 	//Calc X axis
 	//friction 
-	if (fabs(m_VelX) > 0.f && m_State == GSEObjectState::STATE_GROUND)
+	if ((fabs(m_VelX) > 0.f && m_State == GSEObjectState::STATE_GROUND) || 
+		(fabs(m_VelX) > 0.f && m_Type == GSEObjectType::TYPE_BULLET))
 	{
 		//calce temporary
 		accX = param->forceX / m_Mass;
@@ -177,7 +188,7 @@ void GSEObject::Update(float elapsedTimeInSec, GSEUpdateParams* param)
 		//update velocity
 		m_VelY = 0.f;
 	}
-	else if(m_State == GSEObjectState::STATE_GROUND)
+	else if(m_State == GSEObjectState::STATE_GROUND || m_Type == GSEObjectType::TYPE_BULLET)
 	{
 		//calce temporary
 		accX = param->forceX / m_Mass;
@@ -186,7 +197,7 @@ void GSEObject::Update(float elapsedTimeInSec, GSEUpdateParams* param)
 	}
 
 	//Calc Y axis
-	if (m_State == GSEObjectState::STATE_GROUND)
+	if (m_State == GSEObjectState::STATE_GROUND || m_Type == GSEObjectType::TYPE_BULLET)
 	{
 		accY += m_AccY;
 

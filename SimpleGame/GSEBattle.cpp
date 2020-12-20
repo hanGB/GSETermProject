@@ -66,7 +66,7 @@ void GSEBattle::Update(float elapsedTimeInSec, GSEInputs* inputs)
 {
 	// space를 누를 시 시간이 느리게 감
 	if (inputs->KEY_SPACE)
-		elapsedTimeInSec = elapsedTimeInSec / 2;
+		elapsedTimeInSec = elapsedTimeInSec / 3;
 
 	
 	// 테스트 용 enter시 맵 전환
@@ -124,19 +124,18 @@ void GSEBattle::Update(float elapsedTimeInSec, GSEInputs* inputs)
 
 	if (inputs->ARROW_LEFT) {
 		getObject(m_HeroID)->SetDir(-1);
-		swordPosX += -1.f;
+		swordPosX += -1.0f;
 	}
 	if (inputs->ARROW_RIGHT) {
 		getObject(m_HeroID)->SetDir(+1);
-		swordPosX += 1.f;
+		swordPosX += 1.0f;
 	}
-	if (inputs->ARROW_DOWN) swordPosY += -1.f;
-	if (inputs->ARROW_UP) swordPosY += 1.f;
+
 	float swordDirSize = sqrtf(swordPosX * swordPosX + swordPosY * swordPosY);
 	if (swordDirSize > 0.f)
 	{
-		float norDirX = swordPosX / swordDirSize;
-		float norDirY = swordPosY / swordDirSize;
+		float norDirX = swordPosX / swordDirSize / 3;
+		float norDirY =( swordPosY -0.2) / swordDirSize;
 
 		float aX, aY, asX, asY;
 		float bX, bY, bsX, bsY;
@@ -147,12 +146,14 @@ void GSEBattle::Update(float elapsedTimeInSec, GSEInputs* inputs)
 		if (getObject(m_HeroID)->GetRemainingCoolTime() < 0.f)
 		{
 			if (getObject(m_HeroID)->GetAnimationState() != ANIMATION_DIE) {
-				int swordID = AddObject(0.f, 0.f, 0.f, 1.f, 1.f, 0.f, 0.f, 0.f, 0.f, 1.f);
+				int swordID = AddObject(0.f, 0.f, 0.f, 0.5f, 1.0f, 0.f, 0.f, 0.f, 0.f, 1.f);
 				getObject(swordID)->SetParentID(m_HeroID);
 				getObject(swordID)->SetRelPosition(norDirX, norDirY, 0.f);
+				getObject(swordID)->SetApplyPhysics(true);
 				getObject(swordID)->SetStickToParent(true);
 				getObject(swordID)->SetLife(100.f);
 				getObject(swordID)->SetType(TYPE_SWORD);
+
 				getObject(swordID)->SetLifeTime(0.3f); //0.3 초 후 자동 삭제.
 				getObject(m_HeroID)->ResetRemainingCoolTime();
 
@@ -163,6 +164,8 @@ void GSEBattle::Update(float elapsedTimeInSec, GSEInputs* inputs)
 			}
 		}
 	}
+
+	SoldierBehave(elapsedTimeInSec);
 
 	//Processing collision
 	bool isCollide[GSE_MAX_OBJECTS];
@@ -202,8 +205,6 @@ void GSEBattle::Update(float elapsedTimeInSec, GSEInputs* inputs)
 			// Animation Frame Change
 			if (getObject(i)->IsAnimation())
 			{
-
-
 				int aniState;
 				float vx, vy;
 
@@ -247,18 +248,19 @@ void GSEBattle::Update(float elapsedTimeInSec, GSEInputs* inputs)
 
 				getObject(i)->SetAnimationState(aniState);
 
-				// 플레이어 사망시 재시작
-				if (i == m_HeroID) {
-					if (getObject(i)->GetAnimationState() == ANIMATION_DIE) {
-						if (frame + 1 >= getObject(i)->GetAnimationFrameCnt()) {
+				// 사망 애니메이션이 끝나면 삭제
+				if (getObject(i)->GetAnimationState() == ANIMATION_DIE) {
+					if (frame + 1 >= getObject(i)->GetAnimationFrameCnt()) {
+						if (i == m_HeroID) {
 							m_bReadyToPlay = false;
 						}
-
+						getObject(i)->SetLifeTime(0.0f);
 					}
 				}
-
+		
 				GSEObjectState objectState;
 				getObject(i)->GetState(&objectState);
+
 				// 애니메이션 프래임 계산
 				if (aniState == ANIMATION_RUN) {
 					if (objectState == STATE_GROUND) {
@@ -273,11 +275,11 @@ void GSEBattle::Update(float elapsedTimeInSec, GSEInputs* inputs)
 
 				getObject(i)->SetAnimationFrame(frame, frameTime);
 			}
-
 			if (i == m_HeroID)
 			{
 				getObject(i)->Update(elapsedTimeInSec, &heroParam);
 			}
+			
 			else
 			{
 				if (getObject(i)->GetStickToParent())
@@ -292,6 +294,14 @@ void GSEBattle::Update(float elapsedTimeInSec, GSEInputs* inputs)
 				}
 				else
 				{
+					memset(&othersParam, 0, sizeof(GSEUpdateParams));
+
+					GSEObjectType type;
+					getObject(i)->GetType(&type);
+					if (type == TYPE_BULLET) {
+						othersParam.forceX = getObject(i)->GetDir() * 100;
+
+					}
 					getObject(i)->Update(elapsedTimeInSec, &othersParam);
 				}
 			}
@@ -374,15 +384,19 @@ void GSEBattle::RenderScene()
 			if (type == TYPE_FIXED || type == TYPE_WALL || type == TYPE_SWORD)
 			{
 				// 충돌체 체크용
-				// getRenderer()->DrawSolidRect(x, y, depth, sx, sy, 0.f, 1, 0, 1, 1);
+				getRenderer()->DrawSolidRect(x, y, depth, sx, sy, 0.f, 1, 0, 1, 1);
 			}
 			else
 			{
 				if (getObject(i)->IsAnimation()) {
+					// 충돌체 체크용
+					getRenderer()->DrawSolidRect(x, y, depth, getObject(i)->GetDir() * sx, sy, 0.f, 1, 0, 1, 1);
+					
 					int frame;
 					float frametime;
 					float framespeed;
 					getObject(i)->GetAnimationFrame(&frame, &frametime, &framespeed);
+
 					getRenderer()->DrawTextureRectAnim(
 						x, y, depth,
 						getObject(i)->GetDir() * sx, sy, 1.f,
@@ -392,6 +406,9 @@ void GSEBattle::RenderScene()
 						frame, 0);
 				}
 				else {
+					// 충돌체 체크용
+					getRenderer()->DrawSolidRect(x, y, depth, getObject(i)->GetDir() * sx, sy, 0.f, 1, 0, 1, 1);
+
 					getRenderer()->DrawTextureRect(
 						x, y, depth,
 						getObject(i)->GetDir() * sx, -sy, 1.f,
@@ -428,7 +445,7 @@ void GSEBattle::MakeStage(int map)
 
 		//Create Soldier
 		int soldier = AddObject(0, 3, 0, 0.8, 1.75, 0, 0, 0, 0, 70);
-		getObject(soldier)->SetType(GSEObjectType::TYPE_MOVABLE);
+		getObject(soldier)->SetType(GSEObjectType::TYPE_ENEMY);
 		getObject(soldier)->SetApplyPhysics(true);
 		getObject(soldier)->SetLife(100.f);
 		getObject(soldier)->SetLifeTime(100000000.f);
@@ -438,10 +455,11 @@ void GSEBattle::MakeStage(int map)
 		getObject(soldier)->SetAnimationFrame(0, 0);
 		getObject(soldier)->SetAnimationFrameSpeed(0.5, 3, 1, 1);
 		getObject(soldier)->SetDir(-1);
+		getObject(soldier)->SetEnemyType(ENEMY_SOLDIER);
 
 		//Create Soldier with gun attack
 		soldier = AddObject(10, 3, 0, 0.8, 1.75, 0, 0, 0, 0, 70);
-		getObject(soldier)->SetType(GSEObjectType::TYPE_MOVABLE);
+		getObject(soldier)->SetType(GSEObjectType::TYPE_ENEMY);
 		getObject(soldier)->SetApplyPhysics(true);
 		getObject(soldier)->SetLife(100.f);
 		getObject(soldier)->SetLifeTime(100000000.f);
@@ -449,8 +467,9 @@ void GSEBattle::MakeStage(int map)
 			m_SoldierIdleTexture, m_SoldierRunTexture, m_SoldierGunAttackTexture, m_SoldierDieTexture);
 		getObject(soldier)->SetAnimationFrameCnt(5, 12, 5, 7);
 		getObject(soldier)->SetAnimationFrame(0, 0);
-		getObject(soldier)->SetAnimationFrameSpeed(0.5, 3, 1, 1);
+		getObject(soldier)->SetAnimationFrameSpeed(0.5, 3, 0.5, 1);
 		getObject(soldier)->SetDir(-1);
+		getObject(soldier)->SetEnemyType(ENEMY_SOLDIER_WITH_GUN);
 
 		//Create Floor
 		int floor = AddObject(0, -2.5, 0, 67, 0.5, 0, 0, 0, 0, 10000);
@@ -620,3 +639,180 @@ void GSEBattle::MakeStage(int map)
 		getObject(wall)->SetLifeTime(100000000.f);
 	}
 }
+
+void GSEBattle::SoldierBehave(float elapsedTimeInSec)
+{
+	for (int i = 0; i < GSE_MAX_OBJECTS; ++i) {
+		if (getObject(i) != NULL) {
+			GSEObjectType type;
+			getObject(i)->GetType(&type);
+
+			if (type == TYPE_ENEMY) {
+				float x, y, z;
+				getObject(i)->GetPosition(&x, &y, &z);
+
+				float heroX, heroY, heroZ;
+				getObject(m_HeroID)->GetPosition(&heroX, &heroY, &heroZ);
+
+				if (getObject(i)->GetEnemyType() == ENEMY_SOLDIER) {
+					if (getObject(i)->GetAnimationState() == ANIMATION_IDLE ||
+						getObject(i)->GetAnimationState() == ANIMATION_RUN) {
+						if (fabs(heroY - y) < 5 && fabs(heroX - x) < 10) {
+							// 가까우면 공격
+							if (fabs(heroY - y) < 0.5 && fabs(heroX - x) < 0.5) {
+								float swordPosX = 0.f;
+								float swordPosY = 0.f;
+
+								if (heroX - x > 0) {
+									getObject(i)->SetDir(1);
+									swordPosX += 1.0f;
+
+								}
+								else {
+									getObject(i)->SetDir(-1);
+									swordPosX += -1.0f;
+								}
+
+								float swordDirSize = sqrtf(swordPosX * swordPosX + swordPosY * swordPosY);
+								if (swordDirSize > 0.f)
+								{
+									float norDirX = swordPosX / swordDirSize / 3;
+									float norDirY = swordPosY / swordDirSize;
+
+									if (getObject(i)->GetRemainingCoolTime() < 0.f)
+									{
+										if (getObject(i)->GetAnimationState() != ANIMATION_DIE) {
+											int swordID = AddObject(0.f, 0.f, 0.f, 0.5f, 1.0f, 0.f, 0.f, 0.f, 0.f, 1.f);
+											getObject(swordID)->SetParentID(i);
+											getObject(swordID)->SetRelPosition(norDirX, norDirY, 0.f);
+											getObject(swordID)->SetApplyPhysics(true);
+											getObject(swordID)->SetStickToParent(true);
+											getObject(swordID)->SetLife(100.f);
+											getObject(swordID)->SetType(TYPE_SWORD);
+
+											getObject(swordID)->SetLifeTime(0.3f); //0.3 초 후 자동 삭제.
+											getObject(i)->ResetRemainingCoolTime();
+
+											getSound()->PlayShortSound(m_SwordSound, false, 1.f);
+
+											getObject(i)->SetAnimationState(ANIMATION_ATTACK);
+											getObject(i)->SetAnimationFrame(0, 0.f);
+										}
+									}
+								}
+							}
+							// 주인공(히어로)에게 이동
+							else {
+								GSEUpdateParams othersParam;
+								memset(&othersParam, 0, sizeof(GSEUpdateParams));
+
+								float forceAmountX = 2000.f;
+								float forceAmountY = 225.f;
+
+								if (heroX - x > 0) {
+									float vx, vy;
+									getObject(i)->GetVel(&vx, &vy);
+									if (vx > -PLAYER_MAXIUM_SPEED)
+										othersParam.forceX += forceAmountX;
+								}
+								else {
+									float vx, vy;
+									getObject(i)->GetVel(&vx, &vy);
+									if (vx > -PLAYER_MAXIUM_SPEED)
+										othersParam.forceX -= forceAmountX;
+								}
+
+								if ((heroY - y > 2))
+									othersParam.forceY += 70 * forceAmountY;
+								getObject(i)->Update(elapsedTimeInSec, &othersParam);
+							}
+						}
+					}
+				}
+				else if (getObject(i)->GetEnemyType() == ENEMY_SOLDIER_WITH_GUN) {
+					if (getObject(i)->GetAnimationState() == ANIMATION_IDLE ||
+						getObject(i)->GetAnimationState() == ANIMATION_RUN) {
+						if (fabs(heroY - y) < 5 && fabs(heroX - x) < 10) {
+							// 가까우면 공격
+							if (fabs(heroY - y) < 3 && fabs(heroX - x) < 5) {
+								float bulletPosX = 0.f;
+								float bulletPosY = 0.f;
+
+								if (heroX - x > 0) {
+									getObject(i)->SetDir(1);
+									bulletPosX += 1.0f;
+
+								}
+								else {
+									getObject(i)->SetDir(-1);
+									bulletPosX += -1.0f;
+								}
+
+								float swordDirSize = sqrtf(bulletPosX * bulletPosX + bulletPosY * bulletPosY);
+								if (swordDirSize > 0.f)
+								{
+									float norDirX = bulletPosX / swordDirSize / 2;
+									float norDirY = bulletPosY / swordDirSize * 1.5;
+
+									if (getObject(i)->GetRemainingCoolTime() < 0.f)
+									{
+										if (getObject(i)->GetAnimationState() != ANIMATION_DIE) {
+											int bulletID = AddObject(x + norDirX, y + norDirY, z, 0.2f, 0.1f, 0.f, 0.f, 0.f, 0.f, 1.f);
+											getObject(bulletID)->SetParentID(i);
+											getObject(bulletID)->SetApplyPhysics(true);
+											getObject(bulletID)->SetStickToParent(false);
+											getObject(bulletID)->SetLife(100.f);
+											getObject(bulletID)->SetType(TYPE_BULLET);
+											getObject(bulletID)->SetTextureID(m_BulletTexture);
+
+											if (bulletPosX > 0) {
+												getObject(bulletID)->SetDir(1);
+											}
+											else {
+												getObject(bulletID)->SetDir(-1);
+											}
+
+											getObject(bulletID)->SetLifeTime(5.0f); // 5초 후 자동 삭제.
+											getObject(i)->ResetRemainingCoolTime();
+
+											getSound()->PlayShortSound(m_TriggerSound, false, 0.5f);
+
+											getObject(i)->SetAnimationState(ANIMATION_ATTACK);
+											getObject(i)->SetAnimationFrame(0, 0.f);
+										}
+									}
+								}
+							}
+							// 주인공(히어로)에게 이동
+							else {
+								GSEUpdateParams othersParam;
+								memset(&othersParam, 0, sizeof(GSEUpdateParams));
+
+								float forceAmountX = 900.f;
+								float forceAmountY = 225.f;
+
+								if (heroX - x > 0) {
+									float vx, vy;
+									getObject(i)->GetVel(&vx, &vy);
+									if (vx > -PLAYER_MAXIUM_SPEED)
+										othersParam.forceX += forceAmountX;
+								}
+								else {
+									float vx, vy;
+									getObject(i)->GetVel(&vx, &vy);
+									if (vx > -PLAYER_MAXIUM_SPEED)
+										othersParam.forceX -= forceAmountX;
+								}
+
+								if ((heroY - y > 2))
+									othersParam.forceY += 70 * forceAmountY;
+								getObject(i)->Update(elapsedTimeInSec, &othersParam);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+

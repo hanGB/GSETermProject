@@ -24,6 +24,9 @@
 
 #define NON_DATA -1000000
 
+#define ENEMY_SOLDIER 0
+#define ENEMY_SOLDIER_WITH_GUN 1
+
 typedef struct GSEInputs
 {
 	bool ARROW_UP;
@@ -49,11 +52,10 @@ typedef struct GSEUpdateParams
 
 enum GSEObjectType {
 	TYPE_HERO,
-	TYPE_MOVABLE,
+	TYPE_ENEMY,
 	TYPE_FIXED,
 	TYPE_BULLET,
 	TYPE_SWORD,
-	TYPE_FIXED_UP,
 	TYPE_WALL
 };
 
