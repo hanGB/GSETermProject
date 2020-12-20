@@ -35,7 +35,7 @@ GSEBattle::GSEBattle()
 	m_BackGroundSound = getSound()->CreateBGSound("./resource/sound/bg/battleSound.mp3");
 	
 	// 임시 무음
-	//getSound()->PlayBGSound(m_BackGroundSound, true, 0.5f);
+	getSound()->PlayBGSound(m_BackGroundSound, true, 0.3f);
 }
 
 GSEBattle::~GSEBattle()
@@ -70,12 +70,14 @@ void GSEBattle::Update(float elapsedTimeInSec, GSEInputs* inputs)
 
 	
 	// 테스트 용 enter시 맵 전환
+	/*
 	if (inputs->KEY_ENTER) {
 		getObject(m_HeroID)->SetAnimationState(ANIMATION_DIE);
 
 		m_NowMap++;
 		m_NowMap = m_NowMap %2;
 	}
+	*/
 
 	if (!m_bReadyToPlay) {
 		MakeStage(m_NowMap);
@@ -312,7 +314,7 @@ void GSEBattle::Update(float elapsedTimeInSec, GSEInputs* inputs)
 	getObject(m_HeroID)->GetPosition(&x, &y, &z);
 
 	// 플레이어 위치 출력
-	std::cout << "x: " << x * 100 << " , y: " << y * 100 << std::endl;
+	// std::cout << "x: " << x * 100 << " , y: " << y * 100 << std::endl;
 
 	x = x * 100.f;
 	y = y * 100.f;
@@ -384,13 +386,13 @@ void GSEBattle::RenderScene()
 			if (type == TYPE_FIXED || type == TYPE_WALL || type == TYPE_SWORD)
 			{
 				// 충돌체 체크용
-				getRenderer()->DrawSolidRect(x, y, depth, sx, sy, 0.f, 1, 0, 1, 1);
+				//getRenderer()->DrawSolidRect(x, y, depth, sx, sy, 0.f, 1, 0, 1, 1);
 			}
 			else
 			{
 				if (getObject(i)->IsAnimation()) {
 					// 충돌체 체크용
-					getRenderer()->DrawSolidRect(x, y, depth, getObject(i)->GetDir() * sx, sy, 0.f, 1, 0, 1, 1);
+					//getRenderer()->DrawSolidRect(x, y, depth, getObject(i)->GetDir() * sx, sy, 0.f, 1, 0, 1, 1);
 					
 					int frame;
 					float frametime;
@@ -407,7 +409,7 @@ void GSEBattle::RenderScene()
 				}
 				else {
 					// 충돌체 체크용
-					getRenderer()->DrawSolidRect(x, y, depth, getObject(i)->GetDir() * sx, sy, 0.f, 1, 0, 1, 1);
+					//getRenderer()->DrawSolidRect(x, y, depth, getObject(i)->GetDir() * sx, sy, 0.f, 1, 0, 1, 1);
 
 					getRenderer()->DrawTextureRect(
 						x, y, depth,
@@ -445,6 +447,58 @@ void GSEBattle::MakeStage(int map)
 
 		//Create Soldier
 		int soldier = AddObject(0, 3, 0, 0.8, 1.75, 0, 0, 0, 0, 70);
+		getObject(soldier)->SetType(GSEObjectType::TYPE_ENEMY);
+		getObject(soldier)->SetApplyPhysics(true);
+		getObject(soldier)->SetLife(100.f);
+		getObject(soldier)->SetLifeTime(100000000.f);
+		getObject(soldier)->SetAnimationTextureID(
+			m_SoldierIdleTexture, m_SoldierRunTexture, m_SoldierAttackTexture, m_SoldierDieTexture);
+		getObject(soldier)->SetAnimationFrameCnt(5, 12, 7, 7);
+		getObject(soldier)->SetAnimationFrame(0, 0);
+		getObject(soldier)->SetAnimationFrameSpeed(0.5, 3, 1, 1);
+		getObject(soldier)->SetDir(-1);
+		getObject(soldier)->SetEnemyType(ENEMY_SOLDIER);
+
+		soldier = AddObject(-14.66, 0.90, 0, 0.8, 1.75, 0, 0, 0, 0, 70);
+		getObject(soldier)->SetType(GSEObjectType::TYPE_ENEMY);
+		getObject(soldier)->SetApplyPhysics(true);
+		getObject(soldier)->SetLife(100.f);
+		getObject(soldier)->SetLifeTime(100000000.f);
+		getObject(soldier)->SetAnimationTextureID(
+			m_SoldierIdleTexture, m_SoldierRunTexture, m_SoldierAttackTexture, m_SoldierDieTexture);
+		getObject(soldier)->SetAnimationFrameCnt(5, 12, 7, 7);
+		getObject(soldier)->SetAnimationFrame(0, 0);
+		getObject(soldier)->SetAnimationFrameSpeed(0.5, 3, 1, 1);
+		getObject(soldier)->SetDir(-1);
+		getObject(soldier)->SetEnemyType(ENEMY_SOLDIER);
+
+		soldier = AddObject(-2.72, -1.4, 0, 0.8, 1.75, 0, 0, 0, 0, 70);
+		getObject(soldier)->SetType(GSEObjectType::TYPE_ENEMY);
+		getObject(soldier)->SetApplyPhysics(true);
+		getObject(soldier)->SetLife(100.f);
+		getObject(soldier)->SetLifeTime(100000000.f);
+		getObject(soldier)->SetAnimationTextureID(
+			m_SoldierIdleTexture, m_SoldierRunTexture, m_SoldierAttackTexture, m_SoldierDieTexture);
+		getObject(soldier)->SetAnimationFrameCnt(5, 12, 7, 7);
+		getObject(soldier)->SetAnimationFrame(0, 0);
+		getObject(soldier)->SetAnimationFrameSpeed(0.5, 3, 1, 1);
+		getObject(soldier)->SetDir(-1);
+		getObject(soldier)->SetEnemyType(ENEMY_SOLDIER);
+
+		soldier = AddObject(3.72, -1.4, 0, 0.8, 1.75, 0, 0, 0, 0, 70);
+		getObject(soldier)->SetType(GSEObjectType::TYPE_ENEMY);
+		getObject(soldier)->SetApplyPhysics(true);
+		getObject(soldier)->SetLife(100.f);
+		getObject(soldier)->SetLifeTime(100000000.f);
+		getObject(soldier)->SetAnimationTextureID(
+			m_SoldierIdleTexture, m_SoldierRunTexture, m_SoldierAttackTexture, m_SoldierDieTexture);
+		getObject(soldier)->SetAnimationFrameCnt(5, 12, 7, 7);
+		getObject(soldier)->SetAnimationFrame(0, 0);
+		getObject(soldier)->SetAnimationFrameSpeed(0.5, 3, 1, 1);
+		getObject(soldier)->SetDir(-1);
+		getObject(soldier)->SetEnemyType(ENEMY_SOLDIER);
+
+		soldier = AddObject(23.72, -1.4, 0, 0.8, 1.75, 0, 0, 0, 0, 70);
 		getObject(soldier)->SetType(GSEObjectType::TYPE_ENEMY);
 		getObject(soldier)->SetApplyPhysics(true);
 		getObject(soldier)->SetLife(100.f);
@@ -546,7 +600,101 @@ void GSEBattle::MakeStage(int map)
 		getObject(m_HeroID)->SetAnimationFrameCnt(14, 8, 13, 5);
 		getObject(m_HeroID)->SetAnimationFrame(0, 0);
 		getObject(m_HeroID)->SetAnimationFrameSpeed(0.5, 3, 1, 1);
+		
+		// Create Soldier
+		int soldier = AddObject(-12.54, -1.5, 0, 0.8, 1.75, 0, 0, 0, 0, 70);
+		getObject(soldier)->SetType(GSEObjectType::TYPE_ENEMY);
+		getObject(soldier)->SetApplyPhysics(true);
+		getObject(soldier)->SetLife(100.f);
+		getObject(soldier)->SetLifeTime(100000000.f);
+		getObject(soldier)->SetAnimationTextureID(
+			m_SoldierIdleTexture, m_SoldierRunTexture, m_SoldierAttackTexture, m_SoldierDieTexture);
+		getObject(soldier)->SetAnimationFrameCnt(5, 12, 7, 7);
+		getObject(soldier)->SetAnimationFrame(0, 0);
+		getObject(soldier)->SetAnimationFrameSpeed(0.5, 3, 1, 1);
+		getObject(soldier)->SetDir(-1);
+		getObject(soldier)->SetEnemyType(ENEMY_SOLDIER);
 
+		soldier = AddObject(-10.54, -1.5, 0, 0.8, 1.75, 0, 0, 0, 0, 70);
+		getObject(soldier)->SetType(GSEObjectType::TYPE_ENEMY);
+		getObject(soldier)->SetApplyPhysics(true);
+		getObject(soldier)->SetLife(100.f);
+		getObject(soldier)->SetLifeTime(100000000.f);
+		getObject(soldier)->SetAnimationTextureID(
+			m_SoldierIdleTexture, m_SoldierRunTexture, m_SoldierAttackTexture, m_SoldierDieTexture);
+		getObject(soldier)->SetAnimationFrameCnt(5, 12, 7, 7);
+		getObject(soldier)->SetAnimationFrame(0, 0);
+		getObject(soldier)->SetAnimationFrameSpeed(0.5, 3, 1, 1);
+		getObject(soldier)->SetDir(-1);
+		getObject(soldier)->SetEnemyType(ENEMY_SOLDIER);
+
+		soldier = AddObject(5.13, 2.59, 0, 0.8, 1.75, 0, 0, 0, 0, 70);
+		getObject(soldier)->SetType(GSEObjectType::TYPE_ENEMY);
+		getObject(soldier)->SetApplyPhysics(true);
+		getObject(soldier)->SetLife(100.f);
+		getObject(soldier)->SetLifeTime(100000000.f);
+		getObject(soldier)->SetAnimationTextureID(
+			m_SoldierIdleTexture, m_SoldierRunTexture, m_SoldierAttackTexture, m_SoldierDieTexture);
+		getObject(soldier)->SetAnimationFrameCnt(5, 12, 7, 7);
+		getObject(soldier)->SetAnimationFrame(0, 0);
+		getObject(soldier)->SetAnimationFrameSpeed(0.5, 3, 1, 1);
+		getObject(soldier)->SetDir(-1);
+		getObject(soldier)->SetEnemyType(ENEMY_SOLDIER);
+
+		soldier = AddObject(9.13, 2.59, 0, 0.8, 1.75, 0, 0, 0, 0, 70);
+		getObject(soldier)->SetType(GSEObjectType::TYPE_ENEMY);
+		getObject(soldier)->SetApplyPhysics(true);
+		getObject(soldier)->SetLife(100.f);
+		getObject(soldier)->SetLifeTime(100000000.f);
+		getObject(soldier)->SetAnimationTextureID(
+			m_SoldierIdleTexture, m_SoldierRunTexture, m_SoldierAttackTexture, m_SoldierDieTexture);
+		getObject(soldier)->SetAnimationFrameCnt(5, 12, 7, 7);
+		getObject(soldier)->SetAnimationFrame(0, 0);
+		getObject(soldier)->SetAnimationFrameSpeed(0.5, 3, 1, 1);
+		getObject(soldier)->SetDir(-1);
+		getObject(soldier)->SetEnemyType(ENEMY_SOLDIER);
+
+		soldier = AddObject(9.52, -0.3, 0, 0.8, 1.75, 0, 0, 0, 0, 70);
+		getObject(soldier)->SetType(GSEObjectType::TYPE_ENEMY);
+		getObject(soldier)->SetApplyPhysics(true);
+		getObject(soldier)->SetLife(100.f);
+		getObject(soldier)->SetLifeTime(100000000.f);
+		getObject(soldier)->SetAnimationTextureID(
+			m_SoldierIdleTexture, m_SoldierRunTexture, m_SoldierAttackTexture, m_SoldierDieTexture);
+		getObject(soldier)->SetAnimationFrameCnt(5, 12, 7, 7);
+		getObject(soldier)->SetAnimationFrame(0, 0);
+		getObject(soldier)->SetAnimationFrameSpeed(0.5, 3, 1, 1);
+		getObject(soldier)->SetDir(-1);
+		getObject(soldier)->SetEnemyType(ENEMY_SOLDIER);
+
+		// Create Soldier with gun attack
+		soldier = AddObject(0.83, 5.2, 0, 0.8, 1.75, 0, 0, 0, 0, 70);
+		getObject(soldier)->SetType(GSEObjectType::TYPE_ENEMY);
+		getObject(soldier)->SetApplyPhysics(true);
+		getObject(soldier)->SetLife(100.f);
+		getObject(soldier)->SetLifeTime(100000000.f);
+		getObject(soldier)->SetAnimationTextureID(
+			m_SoldierIdleTexture, m_SoldierRunTexture, m_SoldierGunAttackTexture, m_SoldierDieTexture);
+		getObject(soldier)->SetAnimationFrameCnt(5, 12, 5, 7);
+		getObject(soldier)->SetAnimationFrame(0, 0);
+		getObject(soldier)->SetAnimationFrameSpeed(0.5, 3, 0.5, 1);
+		getObject(soldier)->SetDir(-1);
+		getObject(soldier)->SetEnemyType(ENEMY_SOLDIER_WITH_GUN);
+
+		soldier = AddObject(17.98, -1.59, 0, 0.8, 1.75, 0, 0, 0, 0, 70);
+		getObject(soldier)->SetType(GSEObjectType::TYPE_ENEMY);
+		getObject(soldier)->SetApplyPhysics(true);
+		getObject(soldier)->SetLife(100.f);
+		getObject(soldier)->SetLifeTime(100000000.f);
+		getObject(soldier)->SetAnimationTextureID(
+			m_SoldierIdleTexture, m_SoldierRunTexture, m_SoldierGunAttackTexture, m_SoldierDieTexture);
+		getObject(soldier)->SetAnimationFrameCnt(5, 12, 5, 7);
+		getObject(soldier)->SetAnimationFrame(0, 0);
+		getObject(soldier)->SetAnimationFrameSpeed(0.5, 3, 0.5, 1);
+		getObject(soldier)->SetDir(-1);
+		getObject(soldier)->SetEnemyType(ENEMY_SOLDIER_WITH_GUN);
+
+		// Create Floor
 		int floor = AddObject(0, -2.7, 0, 47, 0.5, 0, 0, 0, 0, 10000);
 		getObject(floor)->SetType(GSEObjectType::TYPE_FIXED);
 		getObject(floor)->SetApplyPhysics(true);

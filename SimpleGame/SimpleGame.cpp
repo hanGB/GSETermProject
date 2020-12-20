@@ -50,11 +50,11 @@ void RenderScene(int temp)
 			}
 			
 			//Å×½ºÆ®
-			
+			/*
 			g_GameState = BATTLE_STATE;
 			delete g_title;
 			g_battle = new GSEBattle();
-
+			*/
 			/*
 			g_GameState = ENDING_STATE;
 			delete g_title;
