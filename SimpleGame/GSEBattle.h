@@ -12,8 +12,13 @@ class GSEBattle : public GSEGame {
 	int m_HeroDieTexture;
 	int m_HeroAttackTexture;
 
-	int m_SwordManTexture;
-	int m_GunManTexture;
+	int m_SoldierIdleTexture;
+	int m_SoldierRunTexture;
+	int m_SoldierDieTexture;
+	int m_SoldierAttackTexture;
+	int m_SoldierGunAttackTexture;
+
+	int m_BulletTexture;
 
 	int m_RailRoadMapTexture;
 	int m_FireMapTexture;

@@ -14,8 +14,14 @@ GSEBattle::GSEBattle()
 	m_HeroAttackTexture = getRenderer()->GenPngTexture("./resource/image/battle/heroAttackSprite.png");
 	m_HeroDieTexture = getRenderer()->GenPngTexture("./resource/image/battle/heroDieSprite.png");
 
-	m_SwordManTexture;
-	m_GunManTexture;
+	// 적 군인 텍스쳐
+	m_SoldierIdleTexture = getRenderer()->GenPngTexture("./resource/image/battle/soldierIdleSprite.png");
+	m_SoldierRunTexture = getRenderer()->GenPngTexture("./resource/image/battle/soldierRunSprite.png");
+	m_SoldierDieTexture = getRenderer()->GenPngTexture("./resource/image/battle/soldierDieSprite.png");
+	m_SoldierAttackTexture = getRenderer()->GenPngTexture("./resource/image/battle/soldierAttackSprite.png");
+	m_SoldierGunAttackTexture = getRenderer()->GenPngTexture("./resource/image/battle/soldierGunAttackSprite.png");
+
+	m_BulletTexture = getRenderer()->GenPngTexture("./resource/image/battle/bullet.png");
 
 	// 배경 텍스쳐
 	m_RailRoadMapTexture = getRenderer()->GenPngTexture("./resource/image/battle/mapRailLoad.png");
@@ -44,8 +50,13 @@ GSEBattle::~GSEBattle()
 	getRenderer()->DeleteTexture(m_HeroAttackTexture);
 	getRenderer()->DeleteTexture(m_HeroDieTexture);
 
-	//getRenderer()->DeleteTexture(m_SwordManTexture);
-	//getRenderer()->DeleteTexture(m_GunManTexture);
+	getRenderer()->DeleteTexture(m_SoldierIdleTexture);
+	getRenderer()->DeleteTexture(m_SoldierRunTexture);
+	getRenderer()->DeleteTexture(m_SoldierDieTexture);
+	getRenderer()->DeleteTexture(m_SoldierAttackTexture);
+	getRenderer()->DeleteTexture(m_SoldierGunAttackTexture);
+
+	getRenderer()->DeleteTexture(m_BulletTexture);
 
 	getRenderer()->DeleteTexture(m_RailRoadMapTexture);
 	getRenderer()->DeleteTexture(m_FireMapTexture);
@@ -414,6 +425,32 @@ void GSEBattle::MakeStage(int map)
 		getObject(m_HeroID)->SetAnimationFrameCnt(14, 8, 13, 5);
 		getObject(m_HeroID)->SetAnimationFrame(0, 0); 
 		getObject(m_HeroID)->SetAnimationFrameSpeed(0.5, 3, 1, 1);
+
+		//Create Soldier
+		int soldier = AddObject(0, 3, 0, 0.8, 1.75, 0, 0, 0, 0, 70);
+		getObject(soldier)->SetType(GSEObjectType::TYPE_MOVABLE);
+		getObject(soldier)->SetApplyPhysics(true);
+		getObject(soldier)->SetLife(100.f);
+		getObject(soldier)->SetLifeTime(100000000.f);
+		getObject(soldier)->SetAnimationTextureID(
+			m_SoldierIdleTexture, m_SoldierRunTexture, m_SoldierAttackTexture, m_SoldierDieTexture);
+		getObject(soldier)->SetAnimationFrameCnt(5, 12, 7, 7);
+		getObject(soldier)->SetAnimationFrame(0, 0);
+		getObject(soldier)->SetAnimationFrameSpeed(0.5, 3, 1, 1);
+		getObject(soldier)->SetDir(-1);
+
+		//Create Soldier with gun attack
+		soldier = AddObject(10, 3, 0, 0.8, 1.75, 0, 0, 0, 0, 70);
+		getObject(soldier)->SetType(GSEObjectType::TYPE_MOVABLE);
+		getObject(soldier)->SetApplyPhysics(true);
+		getObject(soldier)->SetLife(100.f);
+		getObject(soldier)->SetLifeTime(100000000.f);
+		getObject(soldier)->SetAnimationTextureID(
+			m_SoldierIdleTexture, m_SoldierRunTexture, m_SoldierGunAttackTexture, m_SoldierDieTexture);
+		getObject(soldier)->SetAnimationFrameCnt(5, 12, 5, 7);
+		getObject(soldier)->SetAnimationFrame(0, 0);
+		getObject(soldier)->SetAnimationFrameSpeed(0.5, 3, 1, 1);
+		getObject(soldier)->SetDir(-1);
 
 		//Create Floor
 		int floor = AddObject(0, -2.5, 0, 67, 0.5, 0, 0, 0, 0, 10000);
