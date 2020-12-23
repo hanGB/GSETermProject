@@ -49,6 +49,7 @@ void Sound::DeleteBGSound(int index)
 		return;
 	}
 	(*iter).second->stop();
+	(*iter).second->drop();
 	m_bgSoundList.erase(index);
 }
 
@@ -63,9 +64,9 @@ void Sound::PlayBGSound(int index, bool bLoop, float volume)
 		std::cout << "No such sound with index " << index << ". \n";
 		return;
 	}
-	(*iter).second->setVolume(volume); 
+	(*iter).second->setVolume(volume);
 	(*iter).second->setPlayPosition(0);
-	(*iter).second->setIsPaused(false); 
+	(*iter).second->setIsPaused(false);
 	(*iter).second->setIsLooped(bLoop);
 }
 
@@ -117,6 +118,7 @@ void Sound::DeleteShortSound(int index)
 		std::cout << "No such sound with index " << index << ". \n";
 		return;
 	}
+	m_engine->removeSoundSource((*iter).second->getName());
 	m_shortSoundList.erase(index);
 }
 
